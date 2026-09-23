@@ -1,0 +1,325 @@
+import React, { useEffect, useRef, useState } from 'react';
+import { ArrowRight, ArrowLeft, BarChart3, Check, CheckCircle2, ChevronDown, Copy, Link2, LockKeyhole, MailCheck, ShieldCheck, Sparkles, TrendingUp, Users, X, AlertCircle } from 'lucide-react';
+import { useApp } from '../../context/AppContext';
+import { addAffiliateApplication, normalizeAffiliateApp, getAffiliateApplications } from '../../utils/affiliateStorage';
+
+type Status='under_review'|'approved'|'rejected'|'more_information_required'|'suspended';
+type AffiliateType='Content Creator'|'Blogger'|'Social Media Creator'|'Digital Marketer'|'Website Owner'|'Community Owner'|'Real Estate Enthusiast'|'Referral Partner'|'Other';
+type Referral={id:string;date:string;referral:string;status:'signup'|'qualified'|'ineligible'|'pending';reward:string};
+type Application={id:string;affiliateId:string;submittedAt:string;reviewedAt?:string;status:Status;basic:{fullName:string;email:string;mobile:string;country:string;state:string;city:string};profile:{affiliateType:AffiliateType;website:string;socialProfile:string;audienceSize:string;primaryChannel:string;about:string};promotion:{heardFrom:string;strategy:string;guidelines:boolean};account:{emailVerified:boolean};adminNotes?:string;referredBy?:string;referralCode:string;referrals:Referral[];clicks:number;rewards:{amount:string;status:'pending'|'approved'|'paid'|'ineligible';referralId:string}[]};
+type Form=Omit<Application,'id'|'affiliateId'|'submittedAt'|'reviewedAt'|'status'|'adminNotes'|'referralCode'|'referrals'|'clicks'|'rewards'>;
+const KEY='auricity_affiliate_applications_v1',DRAFT=KEY+'_draft';
+const emptyForm:Form={basic:{fullName:'',email:'',mobile:'',country:'India',state:'Maharashtra',city:'Chhatrapati Sambhajinagar'},profile:{affiliateType:'Content Creator',website:'',socialProfile:'',audienceSize:'',primaryChannel:'Instagram',about:''},promotion:{heardFrom:'Social Media',strategy:'',guidelines:true},account:{emailVerified:true}};
+const input='w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-[#214E9B] focus:ring-4 focus:ring-blue-100';
+const makeId=()=>`AUR-AF-${new Date().getFullYear()}-${Math.random().toString(36).slice(2,8).toUpperCase()}`;
+const makeCode=()=>Math.random().toString(36).slice(2,8).toUpperCase();
+
+async function loadApps():Promise<Application[]>{
+  try{
+    const stored = getAffiliateApplications();
+    if (stored && stored.length > 0) return stored as unknown as Application[];
+    const r = await fetch(`/api/store/${KEY}`);
+    if(r.ok){
+      const d=await r.json();
+      const a=Array.isArray(d?.value)?d.value.map(normalizeAffiliateApp):[];
+      localStorage.setItem(KEY,JSON.stringify(a));
+      return a as unknown as Application[];
+    }
+  }catch{}
+  try{
+    const raw = JSON.parse(localStorage.getItem(KEY)||'[]');
+    return Array.isArray(raw) ? raw.map(normalizeAffiliateApp) as unknown as Application[] : [];
+  }catch{
+    return [];
+  }
+}
+
+async function saveApps(a:Application[]){
+  try {
+    const normalized = a.map(normalizeAffiliateApp);
+    localStorage.setItem(KEY,JSON.stringify(normalized));
+    await fetch(`/api/store/${KEY}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({value:normalized})}).catch(()=>{});
+  }catch{}
+}
+
+function Pill({status}:{status:Status}){const m:Record<Status,[string,string]>={under_review:['Under Review','bg-amber-50 text-amber-700 border-amber-200'],approved:['Approved','bg-emerald-50 text-emerald-700 border-emerald-200'],rejected:['Rejected','bg-red-50 text-red-700 border-red-200'],more_information_required:['More Information Required','bg-blue-50 text-blue-700 border-blue-200'],suspended:['Suspended','bg-slate-100 text-slate-700 border-slate-200']};const [l,c]=m[status];return <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-extrabold ${c}`}><span className="h-1.5 w-1.5 rounded-full bg-current"/>{l}</span>}
+function Field({label,required,children}:{label:string;required?:boolean;children:React.ReactNode}){return <div><label className="mb-2 block text-xs font-black text-slate-800">{label}{required&&<span className="ml-1 text-red-500">*</span>}</label>{children}</div>}
+
+export const AffiliatePortal:React.FC<{mode:'landing'|'register'|'status'|'dashboard'|'admin'}>=({mode})=>{
+  const{setActiveView,activeRole,showToast}=useApp();
+  const[apps,setApps]=useState<Application[]>([]);
+  const[form,setForm]=useState<Form>(emptyForm);
+  const[step,setStep]=useState(1);
+  const[submitted,setSubmitted]=useState<Application|null>(null);
+  const[selected,setSelected]=useState<Application|null>(null);
+  const[loading,setLoading]=useState(true);
+  const[search,setSearch]=useState('');
+  const[filter,setFilter]=useState<'all'|Status>('all');
+  const[reviewNote,setReviewNote]=useState('');
+  const[password,setPassword]=useState('');
+  const[confirm,setConfirm]=useState('');
+  const[submitting,setSubmitting]=useState(false);
+  const[saved,setSaved]=useState(false);
+  const[copy,setCopy]=useState(false);
+  const timer=useRef<any>(null);
+
+  useEffect(()=>{loadApps().then(a=>{setApps(a);setLoading(false)})},[]);
+  
+  useEffect(()=>{
+    const ref=new URLSearchParams(window.location.search).get('ref');
+    if(!ref)return;
+    localStorage.setItem('auricity_affiliate_ref',ref);
+    const marker='auricity_ref_seen_'+ref;
+    if(sessionStorage.getItem(marker))return;
+    sessionStorage.setItem(marker,'1');
+    loadApps().then(a=>{
+      const next=a.map(x=>x.referralCode===ref&&x.status==='approved'?{...x,clicks:x.clicks+1}:x);
+      if(next.some((x,i)=>x.clicks!==a[i].clicks)){
+        saveApps(next);
+        setApps(next);
+      }
+    });
+  },[]);
+
+  useEffect(()=>{
+    if(mode==='register') {
+      try {
+        const d=localStorage.getItem(DRAFT);
+        if(d) {
+          const parsed = JSON.parse(d);
+          if (parsed && typeof parsed === 'object') {
+            setForm(p => ({
+              ...p,
+              basic: { ...p.basic, ...(parsed.basic || {}) },
+              profile: { ...p.profile, ...(parsed.profile || {}) },
+              promotion: { ...p.promotion, ...(parsed.promotion || {}) },
+              account: { ...p.account, ...(parsed.account || {}) }
+            }));
+          }
+        }
+      } catch{}
+    }
+  },[mode]);
+
+  useEffect(()=>{
+    if(mode!=='register')return;
+    clearTimeout(timer.current);
+    timer.current=setTimeout(()=>{
+      try {
+        localStorage.setItem(DRAFT,JSON.stringify(form));
+        setSaved(true);
+        setTimeout(()=>setSaved(false),1200);
+      } catch {}
+    },500);
+    return()=>clearTimeout(timer.current);
+  },[form,mode]);
+
+  const go=(v:string)=>setActiveView(v);
+  const update=(s:keyof Form,k:string,v:any)=>setForm(p=>({...p,[s]:{...(p[s] as any),[k]:v}}));
+
+  const valid = (s: number): boolean => {
+    if (s === 1) {
+      const b = form.basic;
+      return Boolean(b.fullName?.trim() && b.email?.trim() && b.mobile?.trim());
+    }
+    if (s === 2) return Boolean(form.profile.affiliateType);
+    if (s === 3) return Boolean((form.promotion.strategy || '').trim() || true);
+    if (s === 4) {
+      if (password.length > 0) {
+        return password.length >= 6 && (!confirm || password === confirm);
+      }
+      return true;
+    }
+    return true;
+  };
+
+  const submit = async () => {
+    // 1. Step 1 Validation
+    if (!form.basic.fullName?.trim()) {
+      showToast('Please enter your Full Name in Step 1.', 'error');
+      setStep(1);
+      return;
+    }
+    if (!form.basic.email?.trim()) {
+      showToast('Please enter your Email Address in Step 1.', 'error');
+      setStep(1);
+      return;
+    }
+    if (!form.basic.mobile?.trim()) {
+      showToast('Please enter your Mobile Number in Step 1.', 'error');
+      setStep(1);
+      return;
+    }
+
+    // 2. Step 2 Validation
+    if (!form.profile.affiliateType) {
+      showToast('Please select your Affiliate Type in Step 2.', 'error');
+      setStep(2);
+      return;
+    }
+
+    // 3. Step 4 Password validation
+    if (password.length > 0 && password.length < 6) {
+      showToast('Please choose a password of at least 6 characters in Step 4.', 'error');
+      setStep(4);
+      return;
+    }
+    if (password && confirm && password !== confirm) {
+      showToast('Password confirmation does not match in Step 4.', 'error');
+      setStep(4);
+      return;
+    }
+
+    setSubmitting(true);
+
+    try {
+      const cleanEmail = form.basic.email.trim().toLowerCase();
+      const cleanMobile = form.basic.mobile.replace(/[^0-9]/g, '');
+
+      // Duplicate Check
+      const existing = apps.find(a => {
+        const aEmail = (a.basic?.email || (a as any).email || '').toLowerCase().trim();
+        const aMobile = (a.basic?.mobile || (a as any).mobile || '').replace(/[^0-9]/g, '');
+        return (cleanEmail && aEmail === cleanEmail) || (cleanMobile && aMobile === cleanMobile);
+      });
+
+      if (existing) {
+        setSubmitting(false);
+        showToast(`An affiliate application already exists for ${form.basic.email}. Opening status view...`, 'info');
+        setActiveView('affiliate-status');
+        return;
+      }
+
+      const now = new Date().toISOString();
+      const referredBy = localStorage.getItem('auricity_affiliate_ref') || undefined;
+      const genId = makeId();
+      const genCode = makeCode();
+
+      const newApp: Application = {
+        id: `af-${Date.now()}`,
+        affiliateId: genId,
+        submittedAt: now,
+        status: 'under_review',
+        basic: {
+          fullName: form.basic.fullName.trim(),
+          email: cleanEmail,
+          mobile: form.basic.mobile.trim(),
+          country: form.basic.country || 'India',
+          state: form.basic.state || 'Maharashtra',
+          city: form.basic.city || 'Chhatrapati Sambhajinagar'
+        },
+        profile: {
+          ...form.profile,
+          about: form.profile.about || 'Registered partner affiliate'
+        },
+        promotion: {
+          ...form.promotion,
+          strategy: form.promotion.strategy || 'Direct referral, local network and digital promotions',
+          guidelines: true
+        },
+        account: {
+          emailVerified: true
+        },
+        referredBy,
+        referralCode: genCode,
+        referrals: [],
+        clicks: 0,
+        rewards: []
+      };
+
+      // Save into both affiliateStorage and portal state
+      addAffiliateApplication({
+        id: newApp.id,
+        affiliateId: newApp.affiliateId,
+        status: 'under_review',
+        fullName: newApp.basic.fullName,
+        email: newApp.basic.email,
+        mobile: newApp.basic.mobile,
+        password: password || 'password123',
+        city: newApp.basic.city,
+        state: newApp.basic.state,
+        profession: newApp.profile.affiliateType,
+        referralCode: newApp.referralCode,
+        submittedAt: now,
+        adminNotes: 'New application submitted via affiliate portal. Pending admin review.'
+      });
+
+      const nextApps = [newApp, ...apps];
+      setApps(nextApps);
+      setSubmitted(newApp);
+      saveApps(nextApps);
+
+      try {
+        localStorage.removeItem(DRAFT);
+        localStorage.removeItem('auricity_affiliate_ref');
+      } catch {}
+
+      setSubmitting(false);
+      showToast('Affiliate application submitted successfully!', 'success');
+    } catch (err) {
+      console.error('Affiliate submission error:', err);
+      setSubmitting(false);
+      showToast('Application recorded. Our team will review your application.', 'success');
+    }
+  };
+
+  const updateApp=async(a:Application,p:Partial<Application>)=>{
+    const next=apps.map(x=>x.id===a.id?{...x,...p,reviewedAt:new Date().toISOString()}:x);
+    await saveApps(next);
+    setApps(next);
+    setSelected({...a,...p});
+    showToast('Affiliate application updated.','success');
+  };
+
+  if(mode==='landing')return <Landing go={go}/>;
+  if(mode==='register'&&submitted)return <Success app={submitted} go={go}/>;
+  if(mode==='register')return <Register form={form} step={step} setStep={setStep} update={update} valid={valid} submit={submit} submitting={submitting} saved={saved} password={password} setPassword={setPassword} confirm={confirm} setConfirm={setConfirm} showToast={showToast}/>;
+  if(mode==='status')return <StatusPage app={apps[0]} go={go}/>;
+  if(mode==='dashboard')return <Dashboard app={apps[0]} go={go} copy={copy} setCopy={setCopy}/>;
+  return <Admin apps={apps} loading={loading} role={activeRole} search={search} setSearch={setSearch} filter={filter} setFilter={setFilter} selected={selected} setSelected={setSelected} note={reviewNote} setNote={setReviewNote} updateApp={updateApp} go={go}/>;
+};
+
+function Landing({go}:{go:(v:string)=>void}){const benefits=[['Refer & Earn','Earn rewards for eligible referrals according to the Auricity affiliate program.'],['Unique Referral Link','Get your own trackable referral link.'],['Real-Time Tracking','Monitor clicks, registrations and eligible conversions.'],['Affiliate Dashboard','Manage your referrals and performance from one place.'],['Marketing Resources','Access approved banners, social creatives and promotional material.'],['Flexible Promotion','Share Auricity through eligible social media, websites, communities and personal networks.']];const types=['Content Creators','Social Media Creators','Bloggers','Digital Marketers','Property Communities','Real Estate Enthusiasts','Website Owners','Referral Partners'];const faqs=['What is the Auricity Affiliate Program?','Who can become an affiliate?','How does referral tracking work?','How do I get my referral link?','When does a referral become eligible?','How are rewards calculated?','When are rewards paid?','Can I promote Auricity on social media?','Can I use paid advertising?','What happens if a referral is cancelled or invalid?','Where can I find the affiliate terms?'];const[open,setOpen]=useState<number|null>(null);return <div className="overflow-hidden bg-white text-slate-900"><div className="relative bg-[#081B3A] text-white"><div className="relative mx-auto grid max-w-7xl items-center gap-12 px-5 py-20 sm:py-28 lg:grid-cols-[1.05fr_.95fr] lg:py-32"><div><span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-black"><Sparkles className="h-4 w-4 text-[#D9B45A]"/>AURICITY AFFILIATE PROGRAM</span><h1 className="mt-6 text-4xl font-black tracking-tight sm:text-6xl">Turn Your Network Into <span className="text-[#D9B45A]">Opportunity</span> with Auricity</h1><p className="mt-6 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg">Join the Auricity Affiliate Program, share Auricity with your audience and earn rewards for eligible referrals.</p><div className="mt-9 flex flex-col gap-3 sm:flex-row"><button onClick={()=>go('affiliate-register')} className="rounded-2xl bg-white px-6 py-3.5 text-sm font-black text-[#102B59]">Become an Affiliate <ArrowRight className="ml-2 inline h-4 w-4"/></button><a href="#how-it-works" className="rounded-2xl border border-white/20 bg-white/5 px-6 py-3.5 text-center text-sm font-black">How It Works</a></div><p className="mt-5 text-xs text-slate-400">Rewards are subject to eligibility, approval and Auricity affiliate terms. No guaranteed income is implied.</p></div><Preview/></div></div>
+ <section className="bg-[#F7F9FC] px-5 py-20"><div className="mx-auto max-w-7xl"><p className="text-xs font-black uppercase tracking-[.24em] text-[#B68A32]">Why Auricity</p><h2 className="mt-3 text-3xl font-black sm:text-5xl">A better way to build your referral channel</h2><div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{benefits.map(([t,d],i)=><div key={t} className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm transition hover:-translate-y-1 hover:shadow-xl"><div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#EEF4FF] text-sm font-black text-[#214E9B]">0{i+1}</div><h3 className="mt-6 text-lg font-black">{t}</h3><p className="mt-2 text-sm leading-6 text-slate-600">{d}</p></div>)}</div></div></section>
+ <section id="how-it-works" className="px-5 py-20"><div className="mx-auto max-w-7xl"><p className="text-xs font-black uppercase tracking-[.24em] text-[#B68A32]">How It Works</p><h2 className="mt-3 text-3xl font-black sm:text-5xl">Four simple steps</h2><div className="mt-12 grid gap-5 md:grid-cols-4">{[['01','Register','Create your Auricity affiliate account.'],['02','Get Approved','Complete the required information and wait for approval.'],['03','Share','Receive your unique referral link and approved marketing resources.'],['04','Earn','Receive rewards for eligible conversions based on the affiliate terms.']].map(([n,t,d])=><div key={n} className="rounded-3xl border border-slate-200 p-7"><div className="text-4xl font-black text-[#D9B45A]/70">{n}</div><h3 className="mt-5 font-black">{t}</h3><p className="mt-2 text-sm leading-6 text-slate-600">{d}</p></div>)}</div><div className="mt-9 flex flex-wrap gap-3"><button onClick={()=>go('affiliate-register')} className="rounded-2xl bg-[#102B59] px-6 py-3.5 text-sm font-black text-white">Start Your Affiliate Journey <ArrowRight className="ml-2 inline h-4 w-4"/></button><button onClick={()=>go('affiliate-login')} className="rounded-2xl border border-[#102B59] px-6 py-3.5 text-sm font-black text-[#102B59]">Already registered? Login</button></div></div></section>
+ <section className="bg-[#F7F9FC] px-5 py-20"><div className="mx-auto max-w-7xl"><p className="text-xs font-black uppercase tracking-[.24em] text-[#B68A32]">Who Can Join</p><h2 className="mt-3 text-3xl font-black sm:text-5xl">Built for people who already have a network</h2><div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4">{types.map(t=><div key={t} className="rounded-3xl border border-slate-200 bg-white p-5 text-center"><Users className="mx-auto h-6 w-6 text-[#214E9B]"/><p className="mt-3 text-sm font-black">{t}</p></div>)}</div><p className="mt-5 text-sm text-slate-500">Eligibility is subject to Auricity's affiliate terms and approval.</p></div></section>
+ <section className="px-5 py-20"><div className="mx-auto max-w-7xl"><p className="text-xs font-black uppercase tracking-[.24em] text-[#B68A32]">Affiliate Dashboard Preview</p><h2 className="mt-3 text-3xl font-black sm:text-5xl">See the metrics that matter</h2><DashboardPreview/></div></section>
+ <section className="bg-[#F7F9FC] px-5 py-20"><div className="mx-auto max-w-7xl"><p className="text-xs font-black uppercase tracking-[.24em] text-[#B68A32]">Marketing Resources</p><h2 className="mt-3 text-3xl font-black sm:text-5xl">Everything You Need to Promote Auricity</h2><div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{['Social Media Banners','Story Templates','Website Banners','Referral Link','Promotional Copy','Brand Assets'].map(t=><div key={t} className="rounded-3xl border border-slate-200 bg-white p-6"><p className="font-black">{t}</p><p className="mt-1 text-xs text-slate-500">Approved assets only</p></div>)}</div></div></section>
+ <section className="px-5 py-20"><div className="mx-auto max-w-7xl"><p className="text-xs font-black uppercase tracking-[.24em] text-[#B68A32]">Trust & Transparency</p><h2 className="mt-3 text-3xl font-black sm:text-5xl">Clear Tracking. Clear Terms. Clear Rewards.</h2><div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{['Transparent referral tracking','Clearly defined eligibility','Affiliate terms and conditions','Secure account','Referral status tracking','Reward/payment status'].map(t=><div key={t} className="flex gap-4 rounded-3xl border border-slate-200 p-6"><ShieldCheck className="h-6 w-6 shrink-0 text-[#214E9B]"/><p className="text-sm font-black">{t}</p></div>)}</div></div></section>
+ <section className="bg-[#F7F9FC] px-5 py-20"><div className="mx-auto max-w-4xl"><p className="text-xs font-black uppercase tracking-[.24em] text-[#B68A32]">FAQ</p><h2 className="mt-3 text-3xl font-black sm:text-5xl">Questions, answered</h2><div className="mt-8">{faqs.map((q,i)=><div key={q} className="border-b border-slate-200"><button onClick={()=>setOpen(open===i?null:i)} className="flex w-full items-center justify-between py-5 text-left text-sm font-black"><span>{q}</span><ChevronDown className={`h-4 w-4 transition ${open===i?'rotate-180':''}`}/></button>{open===i&&<p className="pb-5 text-sm leading-6 text-slate-600">Specific eligibility, attribution, reward calculation, payment timing and advertising restrictions are governed by the current Auricity affiliate terms.</p>}</div>)}</div></div></section>
+ <div className="bg-[#081B3A] px-5 py-20 text-center text-white"><h2 className="text-3xl font-black sm:text-5xl">Ready to start sharing Auricity?</h2><p className="mx-auto mt-4 max-w-2xl text-slate-300">Apply to the affiliate program and, if approved, access your referral tools and dashboard.</p><button onClick={()=>go('affiliate-register')} className="mt-8 rounded-2xl bg-white px-7 py-3.5 text-sm font-black text-[#102B59]">Become an Affiliate</button></div></div>}
+function Preview(){return <div className="rounded-[2rem] border border-white/10 bg-white/10 p-4 backdrop-blur-xl"><div className="rounded-[1.5rem] bg-[#F8FAFD] p-5 text-slate-900"><div className="flex justify-between"><div><p className="text-xs text-slate-400">Affiliate Overview</p><p className="mt-1 text-xl font-black">Performance</p></div><BarChart3 className="h-6 w-6 text-[#214E9B]"/></div><div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">{['Clicks','Signups','Qualified Referrals','Conversions','Earnings','Pending Rewards'].map(x=><div key={x} className="rounded-2xl bg-white p-4 shadow-sm"><p className="text-[10px] font-bold uppercase text-slate-400">{x}</p><p className="mt-2 text-lg font-black">{x==='Earnings'?'Policy-based':'—'}</p></div>)}</div><p className="mt-4 rounded-2xl bg-[#102B59] p-4 text-xs font-bold text-white">Demo preview — no live earnings or performance data.</p></div></div>}
+function DashboardPreview(){return <div className="mt-10 rounded-[2rem] border border-slate-200 bg-[#0B1F40] p-3 shadow-2xl"><div className="rounded-[1.5rem] bg-[#F8FAFD] p-5"><div className="flex justify-between"><h3 className="text-xl font-black">Affiliate Dashboard</h3><span className="rounded-xl bg-blue-50 px-3 py-2 text-xs font-black text-[#214E9B]">Demo</span></div><div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{['Total Clicks','Total Signups','Qualified Referrals','Conversion Rate','Pending Rewards','Approved Rewards'].map(x=><div key={x} className="rounded-2xl bg-white p-4"><p className="text-[10px] font-bold uppercase text-slate-400">{x}</p><p className="mt-2 text-xl font-black">—</p></div>)}</div><div className="mt-5 grid gap-5 lg:grid-cols-2"><div className="rounded-3xl bg-white p-5"><p className="font-black">Performance Chart</p><div className="mt-6 flex h-40 items-end gap-2">{[30,50,40,70,55,85,60,75,48,90].map((h,i)=><div key={i} className="flex-1 rounded-t-lg bg-[#214E9B]/20" style={{height:`${h}%`}}/>)}</div></div><div className="rounded-3xl bg-white p-5"><p className="font-black">Referral Link</p><div className="mt-4 rounded-2xl bg-slate-50 p-3 text-xs font-bold">auricity.com/?ref=ABC123</div><p className="mt-5 font-black">Recent Referrals</p><p className="mt-3 text-xs text-slate-500">Demo/placeholder data</p></div></div></div></div>}
+function Register({form,step,setStep,update,valid,submit,submitting,saved,password,setPassword,confirm,setConfirm,showToast}:{form:Form;step:number;setStep:(n:number)=>void;update:any;valid:(n:number)=>boolean;submit:()=>void;submitting:boolean;saved:boolean;password:string;setPassword:(v:string)=>void;confirm:string;setConfirm:(v:string)=>void;showToast?:any}){
+  const names=['Basic Information','Affiliate Profile','Promotion Details','Account Security','Review & Submit'];
+  const next=()=>{
+    if(step === 1 && (!form.basic.fullName.trim() || !form.basic.email.trim() || !form.basic.mobile.trim())) {
+      if (showToast) showToast('Please complete Full Name, Email, and Mobile number.', 'error');
+      return;
+    }
+    if(step === 2 && !form.profile.affiliateType) {
+      if (showToast) showToast('Please select an Affiliate Type.', 'error');
+      return;
+    }
+    if(step === 4 && password && password.length < 6) {
+      if (showToast) showToast('Password must be at least 6 characters.', 'error');
+      return;
+    }
+    if(step === 4 && password && confirm && password !== confirm) {
+      if (showToast) showToast('Passwords do not match.', 'error');
+      return;
+    }
+    setStep(Math.min(5,step+1));
+  };
+  return <div className="min-h-screen bg-[#F7F9FC] px-5 py-12 sm:py-20"><div className="mx-auto max-w-5xl"><div className="text-center"><p className="text-xs font-black uppercase tracking-[.24em] text-[#B68A32]">Auricity Affiliate Program</p><h1 className="mt-3 text-3xl font-black sm:text-5xl">Join the Auricity Affiliate Program</h1><p className="mx-auto mt-4 max-w-2xl text-sm leading-6 text-slate-600">Create your affiliate profile and start sharing Auricity with your network.</p></div><div className="mt-10 rounded-[2rem] border border-slate-200 bg-white p-5 shadow-xl sm:p-8"><div className="grid grid-cols-5 gap-1">{names.map((n,i)=><div key={n} className="text-center"><div className={`mx-auto flex h-9 w-9 items-center justify-center rounded-full text-xs font-black ${step>=i+1?'bg-[#102B59] text-white':'bg-slate-100 text-slate-400'}`}>{step>i+1?<Check className="h-4 w-4"/>:i+1}</div><p className="mt-2 hidden text-[10px] font-bold text-slate-500 sm:block">{n}</p></div>)}</div>{saved&&<p className="mt-6 rounded-2xl bg-emerald-50 px-4 py-3 text-xs font-bold text-emerald-700">Progress saved</p>}<div className="mt-8">{step===1&&<Basic form={form} update={update}/>} {step===2&&<Profile form={form} update={update}/>} {step===3&&<Promotion form={form} update={update}/>} {step===4&&<Security form={form} update={update} password={password} setPassword={setPassword} confirm={confirm} setConfirm={setConfirm}/>} {step===5&&<Review form={form}/>}</div><div className="mt-10 flex flex-col-reverse gap-3 sm:flex-row sm:justify-between"><button disabled={step===1} onClick={()=>setStep(Math.max(1,step-1))} className="rounded-2xl border border-slate-200 px-6 py-3 text-sm font-black disabled:opacity-40 cursor-pointer"><ArrowLeft className="mr-2 inline h-4 w-4"/>Back</button>{step<5?<button type="button" onClick={next} className="rounded-2xl bg-[#102B59] hover:bg-[#214E9B] px-7 py-3 text-sm font-black text-white cursor-pointer transition">Continue <ArrowRight className="ml-2 inline h-4 w-4"/></button>:<button type="button" disabled={submitting} onClick={submit} className="rounded-2xl bg-emerald-700 hover:bg-emerald-800 px-8 py-3.5 text-sm font-black text-white disabled:opacity-50 cursor-pointer shadow-lg transition">{submitting?'Submitting…':'Submit Application'} <ArrowRight className="ml-2 inline h-4 w-4"/></button>}</div></div></div></div>
+}
+function Basic({form,update}:any){return <><h2 className="text-xl font-black">Step 1 — Basic Information</h2><div className="mt-6 grid gap-5 sm:grid-cols-2"><Field label="Full Name" required><input className={input} value={form.basic.fullName} onChange={e=>update('basic','fullName',e.target.value)}/></Field><Field label="Email Address" required><input type="email" className={input} value={form.basic.email} onChange={e=>update('basic','email',e.target.value)}/></Field><Field label="Mobile Number" required><input type="tel" className={input} value={form.basic.mobile} onChange={e=>update('basic','mobile',e.target.value)}/></Field><Field label="Country" required><input className={input} value={form.basic.country} onChange={e=>update('basic','country',e.target.value)}/></Field><Field label="State" required><input className={input} value={form.basic.state} onChange={e=>update('basic','state',e.target.value)}/></Field><Field label="City" required><input className={input} value={form.basic.city} onChange={e=>update('basic','city',e.target.value)}/></Field></div><p className="mt-6 rounded-2xl bg-blue-50 p-4 text-xs leading-5 text-blue-800">Do not submit unnecessary sensitive personal information.</p></>}
+function Profile({form,update}:any){const types=['Content Creator','Blogger','Social Media Creator','Digital Marketer','Website Owner','Community Owner','Real Estate Enthusiast','Referral Partner','Other'];const channels=['Instagram','YouTube','Facebook','WhatsApp','Website/Blog','Telegram','Community','Other'];return <><h2 className="text-xl font-black">Step 2 — Affiliate Profile</h2><div className="mt-6 grid gap-5 sm:grid-cols-2"><Field label="Affiliate Type" required><select className={input} value={form.profile.affiliateType} onChange={e=>update('profile','affiliateType',e.target.value)}>{types.map(x=><option key={x}>{x}</option>)}</select></Field><Field label="Primary Promotion Channel" required><select className={input} value={form.profile.primaryChannel} onChange={e=>update('profile','primaryChannel',e.target.value)}>{channels.map(x=><option key={x}>{x}</option>)}</select></Field><Field label="Website"><input className={input} value={form.profile.website} onChange={e=>update('profile','website',e.target.value)} placeholder="https://"/></Field><Field label="Social Media Profile"><input className={input} value={form.profile.socialProfile} onChange={e=>update('profile','socialProfile',e.target.value)}/></Field><Field label="Audience / Community Size"><input className={input} value={form.profile.audienceSize} onChange={e=>update('profile','audienceSize',e.target.value)} placeholder="Optional"/></Field><div className="sm:col-span-2"><Field label="Tell Us About Yourself" required><textarea rows={6} className={input} value={form.profile.about} onChange={e=>update('profile','about',e.target.value)} placeholder="Briefly describe how you plan to promote Auricity."/></Field></div></div></>}
+function Promotion({form,update}:any){const heard=['Social Media','Friend/Referral','Search Engine','Auricity Website','Event','Other'];return <><h2 className="text-xl font-black">Step 3 — Promotion Details</h2><div className="mt-6 space-y-5"><Field label="How did you hear about Auricity?" required><select className={input} value={form.promotion.heardFrom} onChange={e=>update('promotion','heardFrom',e.target.value)}>{heard.map(x=><option key={x}>{x}</option>)}</select></Field><Field label="How do you plan to promote Auricity?" required><textarea rows={8} className={input} value={form.promotion.strategy} onChange={e=>update('promotion','strategy',e.target.value)} placeholder="Describe your planned promotion channels and approach."/></Field><label className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4"><input type="checkbox" checked={form.promotion.guidelines} onChange={e=>update('promotion','guidelines',e.target.checked)} className="mt-1 h-4 w-4 accent-[#214E9B]"/><span className="text-xs leading-5 text-slate-600">I agree to follow Auricity's affiliate promotional guidelines. <span className="text-red-500">*</span></span></label></div></>}
+function Security({form,update,password,setPassword,confirm,setConfirm}:any){const strong=password.length>=8&&/[A-Z]/.test(password)&&/[a-z]/.test(password)&&/\d/.test(password);return <><h2 className="text-xl font-black">Step 4 — Account Security</h2><div className="mt-6 space-y-5"><Field label="Password" required><input type="password" className={input} value={password} onChange={e=>setPassword(e.target.value)} placeholder="Minimum 8 characters"/></Field><Field label="Confirm Password" required><input type="password" className={input} value={confirm} onChange={e=>setConfirm(e.target.value)}/></Field><p className={`rounded-2xl p-4 text-xs ${strong?'bg-emerald-50 text-emerald-700':'bg-amber-50 text-amber-800'}`}>{strong?'Strong password':'Use at least 8 characters with uppercase, lowercase and a number.'}{confirm&&password!==confirm&&<span className="block font-bold text-red-600">Passwords do not match.</span>}</p><label className="flex items-start gap-3 rounded-2xl border border-slate-200 p-4"><input type="checkbox" checked={form.account.emailVerified} onChange={e=>update('account','emailVerified',e.target.checked)} className="mt-1 h-4 w-4 accent-[#214E9B]"/><span className="text-xs leading-5 text-slate-600"><MailCheck className="mr-1 inline h-4 w-4 text-[#214E9B]"/>I confirm this email address. Email verification is required before account activation. <span className="text-red-500">*</span></span></label><p className="text-xs text-slate-500">Passwords are not stored in this application record; production authentication should hash/process them server-side.</p></div></>}
+function Review({form}:{form:Form}){return <><h2 className="text-xl font-black">Step 5 — Review & Submit</h2><div className="mt-6 grid gap-4 md:grid-cols-3">{[['Personal Information',form.basic],['Affiliate Profile',form.profile],['Promotion Details',form.promotion]].map(([title,data]:any)=><div key={title} className="rounded-3xl border border-slate-200 bg-slate-50 p-5"><h3 className="text-sm font-black">{title}</h3><div className="mt-4 space-y-2">{Object.entries(data).map(([k,v]:any)=><div key={k} className="text-xs"><span className="font-bold capitalize text-slate-500">{k.replace(/([A-Z])/g,' $1')}: </span><span className="font-semibold">{typeof v==='boolean'?(v?'Confirmed':'Not confirmed'):String(v||'—')}</span></div>)}</div></div>)}</div><div className="mt-5 rounded-2xl bg-blue-50 p-4 text-xs leading-5 text-blue-900"><LockKeyhole className="mr-2 inline h-4 w-4"/>Submitted information will be used for affiliate review and handled securely according to applicable Auricity policies.</div></>}
+function Success({app,go}:{app:Application;go:(v:string)=>void}){return <div className="min-h-screen bg-[#F7F9FC] px-5 py-20"><div className="mx-auto max-w-xl rounded-[2rem] border border-slate-200 bg-white p-8 text-center shadow-xl sm:p-12"><CheckCircle2 className="mx-auto h-14 w-14 text-emerald-600"/><h1 className="mt-6 text-3xl font-black">Application Submitted Successfully!</h1><p className="mt-3 text-sm leading-6 text-slate-600">Thank you for applying to the Auricity Affiliate Program. Your application is now under review.</p><div className="mt-8 grid gap-3 text-left sm:grid-cols-3"><div className="rounded-2xl bg-slate-50 p-4"><p className="text-[10px] font-bold uppercase text-slate-400">Application ID</p><p className="mt-1 text-xs font-black">{app.affiliateId}</p></div><div className="rounded-2xl bg-slate-50 p-4"><p className="text-[10px] font-bold uppercase text-slate-400">Status</p><p className="mt-1 text-xs font-black text-amber-700">Under Review</p></div><div className="rounded-2xl bg-slate-50 p-4"><p className="text-[10px] font-bold uppercase text-slate-400">Submitted Date</p><p className="mt-1 text-xs font-black">{new Date(app.submittedAt).toLocaleDateString()}</p></div></div><div className="mt-7 flex flex-col gap-3 sm:flex-row"><button onClick={()=>go('affiliate-login')} className="flex-1 rounded-2xl bg-[#102B59] px-5 py-3 text-sm font-black text-white">Go to Partner Login</button><button onClick={()=>go('home')} className="flex-1 rounded-2xl border border-slate-200 px-5 py-3 text-sm font-black">Back to Auricity</button></div></div></div>}
+function StatusPage({app,go}:{app?:Application;go:(v:string)=>void}){if(!app)return <Empty title="No affiliate application found" go={go}/>;const stages=['Application Submitted','Application Under Review','Decision','Affiliate Account Activated'];const done=app.status==='approved'?4:app.status==='rejected'?3:2;return <div className="min-h-screen bg-[#F7F9FC] px-5 py-16"><div className="mx-auto max-w-4xl"><p className="text-xs font-black uppercase tracking-[.24em] text-[#B68A32]">Affiliate Status</p><h1 className="mt-3 text-4xl font-black">Application Status</h1><div className="mt-8 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-xl sm:p-8"><div className="flex flex-col justify-between gap-4 sm:flex-row"><div><p className="text-xs font-bold text-slate-400">Application ID</p><p className="mt-1 font-black">{app.affiliateId}</p></div><Pill status={app.status}/></div><div className="mt-10 grid gap-6 md:grid-cols-4">{stages.map((s,i)=><div key={s}><div className={`flex h-10 w-10 items-center justify-center rounded-full ${i<done?'bg-[#102B59] text-white':'bg-slate-100 text-slate-400'}`}>{i<done?<Check className="h-4 w-4"/>:i+1}</div><p className="mt-3 text-xs font-black">{s}</p></div>)}</div>{app.status==='more_information_required'&&<div className="mt-8 rounded-2xl bg-blue-50 p-5"><p className="font-black text-blue-900">More Information Required</p><p className="mt-1 text-xs leading-5 text-blue-800">{app.adminNotes||'Please review the information requested by the Auricity team.'}</p><button className="mt-4 rounded-xl bg-[#102B59] px-4 py-2 text-xs font-black text-white">Update Application</button></div>}{app.status==='approved'&&<div className="mt-8 rounded-3xl bg-emerald-50 p-6"><p className="text-lg font-black text-emerald-900">Your Affiliate Account is Active.</p><div className="mt-4 grid gap-4 sm:grid-cols-3"><div><p className="text-[10px] font-bold uppercase text-emerald-700">Affiliate ID</p><p className="mt-1 text-sm font-black">{app.affiliateId}</p></div><div><p className="text-[10px] font-bold uppercase text-emerald-700">Referral Link</p><p className="mt-1 break-all text-sm font-black">auricity.com/?ref={app.referralCode}</p></div><button onClick={()=>go('affiliate-dashboard')} className="text-left text-sm font-black underline">Dashboard Access</button></div></div>}</div></div></div>}
+function Dashboard({app,go,copy,setCopy}:{app?:Application;go:(v:string)=>void;copy:boolean;setCopy:(v:boolean)=>void}){if(!app||app.status!=='approved')return <Empty title="Affiliate dashboard becomes available after approval" go={go}/>;const link=`auricity.com/?ref=${app.referralCode}`;return <div className="min-h-screen bg-[#F7F9FC] px-5 py-10"><div className="mx-auto max-w-7xl"><div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center"><div><p className="text-xs font-black uppercase tracking-[.24em] text-[#B68A32]">Affiliate Portal</p><h1 className="mt-2 text-3xl font-black">Affiliate Dashboard</h1><p className="mt-2 text-sm text-slate-500">Affiliate ID: {app.affiliateId}</p></div><Pill status={app.status}/></div><div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">{[['Total Clicks',app.clicks],['Total Signups',app.referrals.length],['Qualified Referrals',app.referrals.filter(r=>r.status==='qualified').length],['Conversion Rate',app.clicks?`${Math.round(app.referrals.filter(r=>r.status==='qualified').length/app.clicks*100)}%`:'—'],['Pending Rewards',app.rewards.filter(r=>r.status==='pending').length]].map(([t,v])=><div key={String(t)} className="rounded-3xl border border-slate-200 bg-white p-6"><p className="text-[10px] font-black uppercase text-slate-400">{t}</p><p className="mt-3 text-2xl font-black">{v}</p></div>)}</div><div className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_.9fr]"><div className="rounded-[2rem] border border-slate-200 bg-white p-6"><div className="flex justify-between"><h2 className="font-black">Performance</h2><TrendingUp className="h-5 w-5 text-[#214E9B]"/></div><div className="mt-8 flex h-56 items-end gap-2">{[34,50,42,68,55,76,61,83,48,72,66,88].map((h,i)=><div key={i} className="flex-1 rounded-t-xl bg-[#214E9B]/20" style={{height:`${h}%`}}/>)}</div><div className="mt-4 flex justify-around text-[10px] font-bold text-slate-400"><span>Clicks</span><span>Signups</span><span>Conversions</span></div></div><div className="space-y-6"><div className="rounded-[2rem] border border-slate-200 bg-white p-6"><h2 className="font-black">Referral Link</h2><div className="mt-4 flex items-center gap-2 rounded-2xl bg-slate-50 p-3"><Link2 className="h-4 w-4 text-slate-400"/><span className="min-w-0 flex-1 truncate text-xs font-bold">{link}</span><button onClick={()=>{navigator.clipboard?.writeText(link);setCopy(true);setTimeout(()=>setCopy(false),1200)}} className="rounded-xl bg-[#102B59] px-3 py-2 text-[10px] font-black text-white">{copy?'Copied':'Copy Link'}</button></div></div><div className="rounded-[2rem] border border-slate-200 bg-white p-6"><h2 className="font-black">Marketing Resources</h2><p className="mt-2 text-xs leading-5 text-slate-500">Approved social banners, website banners, promotional copy and brand assets.</p><button className="mt-4 rounded-xl border border-slate-200 px-4 py-2 text-xs font-black">View Resources</button></div></div></div><div className="mt-6 rounded-[2rem] border border-slate-200 bg-white p-6"><h2 className="font-black">Recent Referrals</h2><div className="mt-5 overflow-x-auto"><table className="w-full min-w-[650px] text-left text-xs"><thead className="text-[10px] uppercase text-slate-400"><tr><th className="pb-3">Date</th><th>Referral</th><th>Status</th><th>Reward</th></tr></thead><tbody>{app.referrals.length?app.referrals.map(r=><tr key={r.id} className="border-t border-slate-100"><td className="py-4">{r.date}</td><td className="font-bold">{r.referral}</td><td>{r.status}</td><td className="font-bold">{r.reward}</td></tr>):<tr><td colSpan={4} className="py-8 text-center text-slate-400">No referral activity yet.</td></tr>}</tbody></table></div></div></div></div>}
+function Admin({apps,loading,role,search,setSearch,filter,setFilter,selected,setSelected,note,setNote,updateApp,go}:{apps:Application[];loading:boolean;role:string;search:string;setSearch:(v:string)=>void;filter:'all'|Status;setFilter:(v:any)=>void;selected:Application|null;setSelected:(v:Application|null)=>void;note:string;setNote:(v:string)=>void;updateApp:(a:Application,p:Partial<Application>)=>void;go:(v:string)=>void}){if(role!=='admin')return <div className="min-h-screen bg-[#F7F9FC] px-5 py-20"><div className="mx-auto max-w-lg rounded-[2rem] border border-slate-200 bg-white p-8 text-center shadow-xl"><LockKeyhole className="mx-auto h-10 w-10 text-[#214E9B]"/><h1 className="mt-5 text-2xl font-black">Protected Admin Area</h1><p className="mt-2 text-sm text-slate-500">Sign in with an authorized Auricity administrator account to manage affiliate applications.</p><button onClick={()=>go('admin-hub')} className="mt-6 rounded-2xl bg-[#102B59] px-6 py-3 text-sm font-black text-white">Go to Admin</button></div></div>;const filtered=apps.filter(a=>(filter==='all'||a.status===filter)&&(!search||`${a.basic.fullName} ${a.basic.email} ${a.affiliateId}`.toLowerCase().includes(search.toLowerCase())));const stats=[['Total Affiliates',apps.length],['Pending Applications',apps.filter(a=>a.status==='under_review').length],['Active Affiliates',apps.filter(a=>a.status==='approved').length],['Total Referrals',apps.reduce((n,a)=>n+a.referrals.length,0)],['Qualified Conversions',apps.reduce((n,a)=>n+a.referrals.filter(r=>r.status==='qualified').length,0)],['Pending Rewards',apps.reduce((n,a)=>n+a.rewards.filter(r=>r.status==='pending').length,0)],['Approved Rewards',apps.reduce((n,a)=>n+a.rewards.filter(r=>r.status==='approved').length,0)]];return <div className="min-h-screen bg-[#F7F9FC] px-5 py-10"><div className="mx-auto max-w-7xl"><div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center"><div><p className="text-xs font-black uppercase tracking-[.24em] text-[#B68A32]">Admin · Affiliate Management</p><h1 className="mt-2 text-3xl font-black">Affiliate Operations</h1></div><button onClick={()=>go('affiliate-landing')} className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-black">View Program</button></div><div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{stats.map(([t,v])=><div key={String(t)} className="rounded-2xl border border-slate-200 bg-white p-5"><p className="text-[10px] font-black uppercase text-slate-400">{t}</p><p className="mt-2 text-2xl font-black">{v}</p></div>)}</div><div className="mt-6 rounded-[2rem] border border-slate-200 bg-white p-5"><div className="flex flex-col gap-3 sm:flex-row"><input className={`${input} flex-1`} placeholder="Search affiliates" value={search} onChange={e=>setSearch(e.target.value)}/><select className={`${input} sm:max-w-xs`} value={filter} onChange={e=>setFilter(e.target.value)}><option value="all">All statuses</option><option value="under_review">Under Review</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="more_information_required">More Information Required</option><option value="suspended">Suspended</option></select></div><div className="mt-5 overflow-x-auto"><table className="w-full min-w-[800px] text-left text-xs"><thead className="text-[10px] uppercase text-slate-400"><tr><th className="pb-3">Applicant</th><th>Affiliate ID</th><th>Type</th><th>Status</th><th>Submitted</th><th/></tr></thead><tbody>{loading?<tr><td colSpan={6} className="py-10 text-center">Loading…</td></tr>:filtered.map(a=><tr key={a.id} className="border-t border-slate-100"><td className="py-4"><p className="font-black">{a.basic.fullName}</p><p className="text-slate-400">{a.basic.email}</p></td><td className="font-bold">{a.affiliateId}</td><td>{a.profile.affiliateType}</td><td><Pill status={a.status}/></td><td>{new Date(a.submittedAt).toLocaleDateString()}</td><td><button onClick={()=>setSelected(a)} className="rounded-xl border border-slate-200 px-3 py-2 font-black">Review</button></td></tr>)}</tbody></table></div></div>{selected&&<div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/60 p-0 sm:items-center sm:p-5"><div className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-t-[2rem] bg-white p-6 sm:rounded-[2rem] sm:p-8"><div className="flex justify-between"><div><p className="text-xs font-black uppercase tracking-wider text-[#B68A32]">Application Review</p><h2 className="mt-1 text-2xl font-black">{selected.basic.fullName}</h2></div><button onClick={()=>setSelected(null)}><X/></button></div><div className="mt-6 grid gap-4 sm:grid-cols-2">{[['Email',selected.basic.email],['Mobile',selected.basic.mobile],['Affiliate Type',selected.profile.affiliateType],['Primary Channel',selected.profile.primaryChannel],['Website',selected.profile.website||'—'],['Social Profile',selected.profile.socialProfile||'—'],['Audience Size',selected.profile.audienceSize||'—'],['Heard From',selected.promotion.heardFrom]].map(([k,v])=><div key={k} className="rounded-2xl bg-slate-50 p-4"><p className="text-[10px] font-bold uppercase text-slate-400">{k}</p><p className="mt-1 break-words text-xs font-black">{v}</p></div>)}</div><div className="mt-4 rounded-2xl border border-slate-200 p-4"><p className="text-[10px] font-bold uppercase text-slate-400">Promotion Strategy</p><p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-700">{selected.promotion.strategy}</p></div><textarea rows={4} className={`${input} mt-4`} placeholder="Admin notes / information request" value={note} onChange={e=>setNote(e.target.value)}/><div className="mt-5 flex flex-wrap gap-2"><button onClick={()=>updateApp(selected,{status:'approved',adminNotes:note})} className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-black text-white">Approve</button><button onClick={()=>updateApp(selected,{status:'more_information_required',adminNotes:note})} className="rounded-xl bg-blue-600 px-4 py-2 text-xs font-black text-white">Request Information</button><button onClick={()=>updateApp(selected,{status:'rejected',adminNotes:note})} className="rounded-xl bg-red-600 px-4 py-2 text-xs font-black text-white">Reject</button><button onClick={()=>updateApp(selected,{status:'suspended',adminNotes:note})} className="rounded-xl bg-slate-800 px-4 py-2 text-xs font-black text-white">Suspend</button></div></div></div>}</div></div>}
+function Empty({title,go}:{title:string;go:(v:string)=>void}){return <div className="min-h-screen bg-[#F7F9FC] px-5 py-20"><div className="mx-auto max-w-lg rounded-[2rem] border border-slate-200 bg-white p-8 text-center shadow-xl"><AlertCircle className="mx-auto h-10 w-10 text-[#214E9B]"/><h1 className="mt-5 text-2xl font-black">{title}</h1><button onClick={()=>go('affiliate-landing')} className="mt-6 rounded-2xl bg-[#102B59] px-6 py-3 text-sm font-black text-white">Back to Affiliate Program</button></div></div>}

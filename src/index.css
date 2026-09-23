@@ -1,0 +1,407 @@
+@import "tailwindcss";
+
+:root {
+  --primary: #1E4FA8;
+  --primary-hover: #163D85;
+  --primary-light: rgba(30, 79, 168, 0.08);
+  --primary-contrast: #FFFFFF;
+  --secondary: #F2621E;
+  --secondary-hover: #D94F12;
+  --accent: #16A34A;
+  --header-bg: #163D85;
+  --background: #FFFFFF;
+  --surface: #FFFFFF;
+  --surface-secondary: #F8FAFC;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --border: #E2E8F0;
+  --success: #16A34A;
+  --warning: #F59E0B;
+  --error: #EF4444;
+  --radius-btn: 12px;
+  --radius-card: 16px;
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 16px -2px rgba(15, 23, 42, 0.06), 0 2px 4px -1px rgba(15, 23, 42, 0.03);
+}
+
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+    color: var(--text-primary);
+    background-color: var(--background);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+    max-width: 100vw;
+    width: 100%;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Plus Jakarta Sans', 'Sora', system-ui, sans-serif;
+    letter-spacing: -0.025em;
+  }
+}
+
+/* ====================================================
+   DYNAMIC THEME DESIGN SYSTEM UTILITIES
+   ==================================================== */
+
+.bg-theme-primary {
+  background-color: var(--primary);
+}
+.bg-theme-primary-hover:hover {
+  background-color: var(--primary-hover);
+}
+.bg-theme-primary-light {
+  background-color: var(--primary-light);
+}
+.bg-theme-secondary {
+  background-color: var(--secondary);
+}
+.bg-theme-header {
+  background-color: var(--header-bg);
+}
+.bg-theme-surface {
+  background-color: var(--surface);
+}
+.bg-theme-surface-sec {
+  background-color: var(--surface-secondary);
+}
+
+.text-theme-primary {
+  color: var(--primary);
+}
+.text-theme-secondary {
+  color: var(--secondary);
+}
+.text-theme-main {
+  color: var(--text-primary);
+}
+.text-theme-muted {
+  color: var(--text-muted);
+}
+.text-theme-sub {
+  color: var(--text-secondary);
+}
+
+.border-theme-primary {
+  border-color: var(--primary);
+}
+.border-theme-secondary {
+  border-color: var(--secondary);
+}
+.border-theme-base {
+  border-color: var(--border);
+}
+
+/* Dynamic Primary Button */
+.btn-theme-primary {
+  background-color: var(--primary);
+  color: var(--primary-contrast);
+  border-radius: var(--radius-btn);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  font-weight: 800;
+}
+.btn-theme-primary:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.16);
+}
+.btn-theme-primary:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Dynamic Secondary / Accent Button */
+.btn-theme-secondary {
+  background-color: var(--secondary);
+  color: #FFFFFF;
+  border-radius: var(--radius-btn);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  font-weight: 800;
+}
+.btn-theme-secondary:hover {
+  background-color: var(--secondary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px -2px rgba(242, 98, 30, 0.25);
+}
+.btn-theme-secondary:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Dynamic Outline Button */
+.btn-theme-outline {
+  background-color: transparent;
+  color: var(--primary);
+  border: 1.5px solid var(--primary);
+  border-radius: var(--radius-btn);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  font-weight: 700;
+}
+.btn-theme-outline:hover {
+  background-color: var(--primary-light);
+  transform: translateY(-1px);
+}
+
+/* Dynamic Theme Card */
+.card-theme {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.card-theme:hover {
+  box-shadow: var(--shadow-md);
+  border-color: rgba(15, 23, 42, 0.12);
+  transform: translateY(-2px);
+}
+
+/* Dynamic Theme Badges */
+.badge-theme-primary {
+  background-color: var(--primary-light);
+  color: var(--primary);
+  border: 1px solid rgba(30, 79, 168, 0.18);
+  font-weight: 800;
+  border-radius: 9999px;
+}
+.badge-theme-secondary {
+  background-color: rgba(242, 98, 30, 0.1);
+  color: var(--secondary);
+  border: 1px solid rgba(242, 98, 30, 0.25);
+  font-weight: 800;
+  border-radius: 9999px;
+}
+
+/* Custom Shadows */
+.shadow-subtle {
+  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 1px 2px -1px rgba(15, 23, 42, 0.03);
+}
+
+.shadow-card {
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+}
+
+.shadow-card-hover {
+  box-shadow: 0 20px 35px -8px rgba(15, 23, 42, 0.10), 0 8px 16px -4px rgba(15, 23, 42, 0.05);
+}
+
+.hover-lift {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 30px -8px rgba(15, 23, 42, 0.09), 0 6px 12px -4px rgba(15, 23, 42, 0.04);
+}
+
+/* Hide Scrollbar */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Continuous bank partner marquee */
+@keyframes auricity-bank-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.bank-marquee {
+  animation: auricity-bank-marquee 34s linear infinite;
+  will-change: transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bank-marquee { animation-duration: 80s; }
+}
+
+/* Global responsive guardrails for every route. */
+img, video, canvas, svg { max-width: 100%; }
+button, input, select, textarea { max-width: 100%; }
+@media (max-width: 640px) {
+  main { min-width: 0; }
+  section { max-width: 100%; }
+}
+
+
+/* ====================================================
+   AURICITY HOMEPAGE — COMPACT CLIENT WIREFRAME
+   Matches the supplied 4-page homepage reference:
+   tighter vertical rhythm, smaller cards, denser sections.
+   ==================================================== */
+
+[data-home-section] > section {
+  padding-top: 24px !important;
+  padding-bottom: 24px !important;
+}
+
+[data-home-section] > section > div.max-w-7xl {
+  gap: 16px !important;
+}
+
+/* Hero: compact visual banner + compact search console */
+#hero-video-banner-section {
+  min-height: 390px !important;
+}
+#hero-video-banner-section > div.relative.z-10 {
+  padding-top: 22px !important;
+  padding-bottom: 20px !important;
+}
+#hero-video-banner-section .auricity-home-search-console {
+  margin-top: 14px !important;
+}
+#hero-video-banner-section .auricity-home-search-console > div {
+  padding: 10px !important;
+  border-radius: 14px !important;
+}
+#hero-video-banner-section .auricity-home-search-console form {
+  gap: 8px !important;
+}
+
+/* Four action cards: exactly four compact columns on desktop */
+#four-cta-cards-section .grid {
+  align-items: stretch;
+}
+#four-cta-cards-section [id^="cta-card-"] {
+  min-height: 148px;
+}
+#four-cta-cards-section [id^="cta-card-"] p {
+  font-size: 10px !important;
+  line-height: 1.35 !important;
+}
+#four-cta-cards-section [id^="cta-card-"] .pt-3 {
+  padding-top: 8px !important;
+}
+
+/* Localities and services: small, horizontal catalogue-style cards */
+#explore-top-localities-section .flex.sm\:grid > div {
+  min-width: 150px !important;
+}
+#explore-top-localities-section .aspect-16\/10 {
+  height: 86px !important;
+  aspect-ratio: auto !important;
+}
+#what-we-do-best-services-section .flex.items-stretch > div {
+  width: 175px !important;
+}
+#what-we-do-best-services-section .relative.h-36 {
+  height: 86px !important;
+}
+#what-we-do-best-services-section .p-4 {
+  padding: 9px !important;
+}
+
+/* Projects / properties: tighter wireframe proportions */
+#projects-in-sambhajinagar-section .grid.grid-cols-1.lg\:grid-cols-12,
+#properties-on-sale-section .grid.grid-cols-1.lg\:grid-cols-12,
+#properties-on-rent-section .grid.grid-cols-1.lg\:grid-cols-12 {
+  gap: 12px !important;
+}
+#projects-in-sambhajinagar-section .card-theme,
+#properties-on-sale-section .group,
+#properties-on-rent-section .card-theme {
+  border-radius: 10px !important;
+}
+#projects-in-sambhajinagar-section .aspect-16\/10 {
+  min-height: 92px !important;
+}
+#properties-on-sale-section .aspect-4\/3 {
+  min-height: 95px !important;
+}
+#properties-on-rent-section .aspect-16\/10 {
+  min-height: 95px !important;
+}
+
+/* Featured sidebars: compact two-card stack like the supplied reference */
+#projects-in-sambhajinagar-section .lg\:col-span-4,
+#properties-on-sale-section .lg\:col-span-4,
+#properties-on-rent-section .lg\:col-span-4 {
+  padding: 10px !important;
+  border-radius: 12px !important;
+}
+#projects-in-sambhajinagar-section .lg\:col-span-4 .space-y-4,
+#properties-on-sale-section .lg\:col-span-4 .space-y-4,
+#properties-on-rent-section .lg\:col-span-4 .space-y-4 {
+  gap: 8px !important;
+}
+
+/* Loan banner: short promotional strip */
+#loan-banner-section {
+  padding-top: 18px !important;
+  padding-bottom: 18px !important;
+}
+#loan-banner-section h2 {
+  font-size: 24px !important;
+}
+#loan-banner-section .bank-marquee {
+  gap: 8px !important;
+}
+
+/* Realtors: compact profile rail */
+#verified-realtors-section .flex.sm\:grid {
+  gap: 8px !important;
+}
+#verified-realtors-section [class*="w-\[240px\]"] {
+  width: 160px !important;
+  padding: 10px !important;
+}
+#verified-realtors-section [class*="h-36"] {
+  height: 92px !important;
+}
+
+/* Clubs: two compact cards */
+#two-club-cards-section .grid {
+  gap: 12px !important;
+}
+#two-club-cards-section .grid > div {
+  padding: 16px !important;
+  border-radius: 14px !important;
+}
+#two-club-cards-section ul {
+  gap: 6px !important;
+}
+
+/* Buyer stories + news: reduce the large editorial spacing */
+#keys-to-happiness-buyers-section,
+#news-and-articles-section {
+  padding-top: 24px !important;
+  padding-bottom: 24px !important;
+}
+
+/* Mobile: preserve usability while keeping the same compact density */
+@media (max-width: 767px) {
+  [data-home-section] > section {
+    padding-top: 18px !important;
+    padding-bottom: 18px !important;
+  }
+  #hero-video-banner-section {
+    min-height: 440px !important;
+  }
+  #hero-video-banner-section h1 {
+    font-size: 26px !important;
+  }
+  #four-cta-cards-section [id^="cta-card-"] {
+    min-height: 158px;
+  }
+  #four-cta-cards-section .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  #explore-top-localities-section .flex.sm\:grid > div {
+    min-width: 145px !important;
+  }
+}
