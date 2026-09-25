@@ -45,7 +45,7 @@ export const HeroVideoSection: React.FC<HeroVideoSectionProps> = ({ onOpenEMIMod
       query: searchQuery,
       locality: selectedLocality,
       propertyType: selectedPropertyType,
-      bhk: selectedBhk,
+      bhk: selectedBhk ? Number(selectedBhk) : undefined,
       listingType: activeTab === 'buy' ? 'sale' : activeTab === 'rent' ? 'rent' : activeTab === 'pg' ? 'pg' : 'commercial'
     });
 
@@ -56,7 +56,7 @@ export const HeroVideoSection: React.FC<HeroVideoSectionProps> = ({ onOpenEMIMod
   };
 
   return (
-    <section className="relative w-full overflow-hidden bg-[#F5F1E8] text-slate-900 min-h-[390px] sm:min-h-[430px] flex flex-col justify-between border-b border-[#E5DEC9] transition-colors" id="hero-video-banner-section">
+    <section className="relative w-full overflow-hidden bg-[#F5F1E8] text-slate-900 min-h-[320px] sm:min-h-[420px] flex flex-col justify-between border-b border-[#E5DEC9] transition-colors" id="hero-video-banner-section">
       
       {/* Background Video / Architectural Visual Layer with Loop & Warm Light Overlay */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
@@ -81,13 +81,13 @@ export const HeroVideoSection: React.FC<HeroVideoSectionProps> = ({ onOpenEMIMod
       </div>
 
       {/* Main Hero Content Container */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 pb-6 w-full flex-1 flex flex-col justify-center">
+      <div className="relative z-10 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-7 pb-4 sm:pb-6 w-full flex-1 flex flex-col justify-center">
         
         {/* Top Trust Pill & Tagline */}
-        <div className="text-center space-y-2.5 max-w-3xl mx-auto">
+        <div className="text-center space-y-2 max-w-3xl mx-auto">
           
-          <div className="inline-flex items-center space-x-2 bg-white/95 backdrop-blur-md px-3 py-1 rounded-full border border-amber-300/80 shadow-xs text-xs">
-            <span className="w-2 h-2 rounded-full bg-[#F2621E] animate-pulse shrink-0"></span>
+          <div className="inline-flex items-center space-x-1.5 sm:space-x-2 bg-white/95 backdrop-blur-md px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full border border-amber-300/80 shadow-xs text-[11px] sm:text-xs">
+            <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#F2621E] animate-pulse shrink-0"></span>
             <span className="font-black text-[#F2621E]">0% Brokerage</span>
             <span className="text-slate-300">•</span>
             <span className="font-bold text-slate-800">100% Direct Owner Homes</span>
@@ -96,40 +96,40 @@ export const HeroVideoSection: React.FC<HeroVideoSectionProps> = ({ onOpenEMIMod
           </div>
 
           {/* Main Hero Headline */}
-          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-[#1E4FA8] tracking-tight leading-[1.12]">
+          <h1 className="text-xl sm:text-3xl lg:text-5xl font-black text-[#1E4FA8] tracking-tight leading-[1.15]">
             {homeHeading}
           </h1>
 
-          <p className="text-xs sm:text-sm text-slate-700 max-w-2xl mx-auto font-medium leading-relaxed">
+          <p className="text-[11px] sm:text-sm text-slate-700 max-w-2xl mx-auto font-medium leading-relaxed line-clamp-2 sm:line-clamp-none">
             {homeSubheading}
           </p>
 
           {/* Quick CTA Actions */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 pt-1 w-full max-w-md sm:max-w-none mx-auto">
+          <div className="grid grid-cols-2 sm:flex sm:flex-row items-center justify-center gap-2 pt-1 w-full max-w-sm sm:max-w-none mx-auto">
             <button
               onClick={() => setActiveView('properties')}
-              className="btn-theme-secondary text-xs sm:text-sm font-black px-5 py-3 sm:py-2.5 rounded-xl shadow-md flex items-center justify-center space-x-2 cursor-pointer transform hover:-translate-y-0.5 transition-all text-white w-full sm:w-auto"
+              className="btn-theme-secondary text-[11px] sm:text-sm font-black px-2.5 sm:px-4 py-1.5 sm:py-2.5 rounded-xl shadow-md flex items-center justify-center space-x-1 sm:space-x-2 cursor-pointer transform hover:-translate-y-0.5 transition-all text-white"
             >
-              <span>Explore Verified Properties</span>
-              <ArrowRight className="w-4 h-4" />
+              <span className="truncate">Explore Properties</span>
+              <ArrowRight className="w-3.5 h-3.5 shrink-0" />
             </button>
 
             <button
               onClick={() => setActiveView('post-property')}
-              className="bg-white hover:bg-slate-50 text-[#1E4FA8] border border-slate-300 text-xs sm:text-sm font-bold px-5 py-3 sm:py-2.5 rounded-xl shadow-xs flex items-center justify-center space-x-2 cursor-pointer transition-all w-full sm:w-auto"
+              className="bg-white hover:bg-slate-50 text-[#1E4FA8] border border-slate-300 text-[11px] sm:text-sm font-bold px-2.5 sm:px-4 py-1.5 sm:py-2.5 rounded-xl shadow-xs flex items-center justify-center space-x-1 sm:space-x-2 cursor-pointer transition-all"
             >
-              <PlusCircle className="w-4 h-4 text-[#F2621E]" />
-              <span>Post Free Property (Owner)</span>
+              <PlusCircle className="w-3.5 h-3.5 text-[#F2621E] shrink-0" />
+              <span className="truncate">Post Free (Owner)</span>
             </button>
           </div>
         </div>
 
         {/* Section 3: Advanced Search Console sitting on top of video banner */}
-        <div className="mt-4 sm:mt-5 max-w-5xl mx-auto w-full">
-          <div className="auricity-home-search-console bg-white text-slate-900 rounded-2xl shadow-lg border border-[#E2DAC6] p-2.5 sm:p-3 space-y-2">
+        <div className="mt-2.5 sm:mt-5 max-w-5xl mx-auto w-full">
+          <div className="auricity-home-search-console bg-white text-slate-900 rounded-xl sm:rounded-2xl shadow-lg border border-[#E2DAC6] p-2 sm:p-3 space-y-1 sm:space-y-2">
             
             {/* Search Category Tabs */}
-            <div className="flex items-center space-x-1.5 sm:space-x-2 border-b border-slate-100 pb-2 overflow-x-auto no-scrollbar">
+            <div className="flex items-center space-x-1 sm:space-x-2 border-b border-slate-100 pb-1 sm:pb-2 overflow-x-auto no-scrollbar">
               {[
                 { id: 'buy', label: 'Buy Properties', icon: Building2 },
                 { id: 'rent', label: 'Rent Direct', icon: KeyRound },
@@ -143,13 +143,13 @@ export const HeroVideoSection: React.FC<HeroVideoSectionProps> = ({ onOpenEMIMod
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id as any)}
-                    className={`px-3.5 sm:px-4 py-1.5 rounded-lg text-[11px] font-black transition-all flex items-center space-x-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
+                    className={`px-2.5 sm:px-4 py-1 sm:py-1.5 rounded-lg text-[10px] sm:text-[11px] font-black transition-all flex items-center space-x-1 sm:space-x-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
                       isActive 
-                        ? 'bg-[var(--primary)] text-white shadow-md' 
+                        ? 'bg-[var(--primary)] text-white shadow-xs' 
                         : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                     }`}
                   >
-                    <Icon className="w-3.5 h-3.5" />
+                    <Icon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                     <span>{tab.label}</span>
                   </button>
                 );
@@ -162,20 +162,20 @@ export const HeroVideoSection: React.FC<HeroVideoSectionProps> = ({ onOpenEMIMod
             </div>
 
             {/* Main Search Controls Form */}
-            <form onSubmit={handleSearch} className="space-y-3">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2">
+            <form onSubmit={handleSearch} className="space-y-2 sm:space-y-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-1.5 sm:gap-2">
                 
                 {/* Locality Selector (4 cols on lg) */}
                 <div className="lg:col-span-3">
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+                  <label className="block text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5 sm:mb-1">
                     Locality / Area
                   </label>
                   <div className="relative">
-                    <MapPin className="w-4 h-4 text-[#F2621E] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <MapPin className="w-3.5 h-3.5 text-[#F2621E] absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                     <select
                       value={selectedLocality}
                       onChange={(e) => setSelectedLocality(e.target.value)}
-                      className="w-full pl-9 pr-7 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:border-[var(--primary)] focus:bg-white transition-colors cursor-pointer"
+                      className="w-full pl-8 pr-6 py-1.5 sm:py-2 bg-slate-50 border border-slate-200 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold text-slate-900 focus:outline-none focus:border-[var(--primary)] focus:bg-white transition-colors cursor-pointer"
                     >
                       <option value="">All Sambhajinagar Localities</option>
                       {localitiesList.map((loc) => (
@@ -187,15 +187,15 @@ export const HeroVideoSection: React.FC<HeroVideoSectionProps> = ({ onOpenEMIMod
 
                 {/* BHK / Unit dropdown (3 cols on lg) */}
                 <div className="lg:col-span-3">
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+                  <label className="block text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5 sm:mb-1">
                     BHK / Unit Type
                   </label>
                   <div className="relative">
-                    <Building2 className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <Building2 className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                     <select
                       value={selectedBhk}
                       onChange={(e) => setSelectedBhk(e.target.value)}
-                      className="w-full pl-9 pr-7 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:border-[var(--primary)] focus:bg-white transition-colors cursor-pointer"
+                      className="w-full pl-8 pr-6 py-1.5 sm:py-2 bg-slate-50 border border-slate-200 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold text-slate-900 focus:outline-none focus:border-[var(--primary)] focus:bg-white transition-colors cursor-pointer"
                     >
                       <option value="">Any BHK / Config</option>
                       <option value="1">1 BHK</option>
@@ -210,13 +210,13 @@ export const HeroVideoSection: React.FC<HeroVideoSectionProps> = ({ onOpenEMIMod
 
                 {/* Budget Dropdown (3 cols on lg) */}
                 <div className="lg:col-span-3">
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+                  <label className="block text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5 sm:mb-1">
                     Budget Range
                   </label>
                   <select
                     value={selectedBudget}
                     onChange={(e) => setSelectedBudget(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:border-[var(--primary)] focus:bg-white transition-colors cursor-pointer"
+                    className="w-full px-2.5 py-1.5 sm:py-2 bg-slate-50 border border-slate-200 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold text-slate-900 focus:outline-none focus:border-[var(--primary)] focus:bg-white transition-colors cursor-pointer"
                   >
                     <option value="">Any Budget</option>
                     <option value="under-25L">Under ₹25 Lakhs</option>
@@ -233,9 +233,9 @@ export const HeroVideoSection: React.FC<HeroVideoSectionProps> = ({ onOpenEMIMod
                 <div className="lg:col-span-3 flex items-end">
                   <button
                     type="submit"
-                    className="btn-theme-secondary w-full h-[40px] text-xs sm:text-sm font-black rounded-xl flex items-center justify-center space-x-1.5 cursor-pointer shadow-md text-white transform hover:-translate-y-0.5 active:translate-y-0 transition-all"
+                    className="btn-theme-secondary w-full h-[34px] sm:h-[40px] text-xs sm:text-sm font-black rounded-lg sm:rounded-xl flex items-center justify-center space-x-1.5 cursor-pointer shadow-md text-white transform hover:-translate-y-0.5 active:translate-y-0 transition-all"
                   >
-                    <Search className="w-4 h-4" />
+                    <Search className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     <span>Search Properties</span>
                   </button>
                 </div>

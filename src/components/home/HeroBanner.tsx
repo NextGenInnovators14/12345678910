@@ -38,7 +38,7 @@ export const HeroBanner: React.FC = () => {
       query: searchQuery,
       locality: selectedLocality,
       propertyType: selectedPropertyType,
-      bhk: selectedBhk,
+      bhk: selectedBhk ? Number(selectedBhk) : undefined,
       listingType: activeTab === 'buy' ? 'sale' : activeTab === 'rent' ? 'rent' : activeTab === 'pg' ? 'pg' : 'commercial'
     });
 

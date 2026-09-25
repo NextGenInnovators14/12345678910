@@ -15,7 +15,6 @@ import {
   CheckCircle2,
   PhoneCall,
   Calendar,
-  Clock,
   MapPin,
   ShieldCheck,
   ArrowRight,
@@ -23,7 +22,6 @@ import {
   Percent,
   X,
   Sparkle,
-  BadgeCheck,
   Check,
   Briefcase,
   Home,
@@ -128,7 +126,7 @@ export const HomeServicesView: React.FC = () => {
         locality: selectedLocality,
         date: bookingDate || 'Immediate / Flexible',
         notes: serviceGroup === 'property' ? `${notes}${propertyBudget ? ` | Budget: ${propertyBudget}` : ''}${propertyType ? ` | Property Type: ${propertyType}` : ''}` : notes,
-        status: 'confirmed'
+        status: 'new'
       });
 
       setSubmitting(false);
@@ -329,41 +327,6 @@ export const HomeServicesView: React.FC = () => {
             })}
           </div>
         )}
-
-        {/* Sambhajinagar Trust Assurances */}
-        <div className="bg-white rounded-3xl border border-slate-200/90 shadow-subtle p-6 sm:p-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="space-y-1.5">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-[#1E4FA8]">
-              <Clock className="w-5 h-5" />
-            </div>
-            <h4 className="text-sm font-black text-[#0F172A]">30-Min Rapid Arrival</h4>
-            <p className="text-xs text-[#64748B] leading-relaxed">Emergency electrician and plumbing pros stationed across CIDCO, Samarth Nagar & Garkheda.</p>
-          </div>
-
-          <div className="space-y-1.5">
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
-              <BadgeCheck className="w-5 h-5" />
-            </div>
-            <h4 className="text-sm font-black text-[#0F172A]">Background-Checked Pros</h4>
-            <p className="text-xs text-[#64748B] leading-relaxed">Police-verified, Aadhaar-authenticated technicians with professional toolkits.</p>
-          </div>
-
-          <div className="space-y-1.5">
-            <div className="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center text-[#F2621E]">
-              <Percent className="w-5 h-5" />
-            </div>
-            <h4 className="text-sm font-black text-[#0F172A]">Fixed Rate Card</h4>
-            <p className="text-xs text-[#64748B] leading-relaxed">Zero hidden charges or arbitrary post-job surcharges. Standard transparent pricing.</p>
-          </div>
-
-          <div className="space-y-1.5">
-            <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600">
-              <ShieldCheck className="w-5 h-5" />
-            </div>
-            <h4 className="text-sm font-black text-[#0F172A]">30-Day Free Warranty</h4>
-            <p className="text-xs text-[#64748B] leading-relaxed">Complete service guarantee with free inspection & rework if you are not 100% satisfied.</p>
-          </div>
-        </div>
 
       </div>
 

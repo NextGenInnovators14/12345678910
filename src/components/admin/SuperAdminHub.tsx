@@ -5,6 +5,7 @@ import { PageContentEditor } from './cms/PageContentEditor';
 import { MediaLibrary } from './cms/MediaLibrary';
 import { BlogNewsManager } from './cms/BlogNewsManager';
 import { ProjectsPropertiesManager } from './cms/ProjectsPropertiesManager';
+import { ProjectsManager } from './cms/ProjectsManager';
 import { SiteWideSettingsManager } from './cms/SiteWideSettingsManager';
 import { RealtorsClubCardsManager } from './cms/RealtorsClubCardsManager';
 import { KnowledgeHubManager } from './cms/KnowledgeHubManager';
@@ -160,8 +161,8 @@ export const SuperAdminHub: React.FC = () => {
     {
       title: 'Real Estate Catalog',
       items: [
-        { id: 'properties', label: 'Properties Inventory', hint: 'Add, edit, price, photos', icon: Building2, badge: totalListings, badgeColor: 'bg-blue-600 text-white' },
-        { id: 'projects', label: 'Mega Townships & Projects', hint: 'RERA registered projects', icon: Landmark, badge: projects.length, badgeColor: 'bg-indigo-600 text-white' },
+        { id: 'properties', label: 'Properties (Ghar / Flat / Plot)', hint: 'Individual Sale & Rent listings', icon: Home, badge: totalListings, badgeColor: 'bg-emerald-600 text-white' },
+        { id: 'projects', label: 'Mega Projects (Townships / Mandates)', hint: 'RERA developer high-rises & townships', icon: Building2, badge: projects.length, badgeColor: 'bg-blue-600 text-white' },
         { id: 'services', label: 'Doorstep Home Services', hint: 'Painting, cleaning, packers', icon: Wrench },
         { id: 'offers', label: 'Offers & Campaigns', hint: 'Discounts & festive vouchers', icon: Tag, badge: offers.length }
       ]
@@ -268,15 +269,38 @@ export const SuperAdminHub: React.FC = () => {
           </div>
 
           {/* Right Action Buttons */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            {/* Direct Add Property Button */}
+            <button
+              id="top-bar-add-property-btn"
+              onClick={() => setActiveTab('properties')}
+              className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] sm:text-xs font-black flex items-center gap-1 sm:gap-1.5 shadow-sm transition-all cursor-pointer"
+              title="Add a new Property listing"
+            >
+              <Home className="w-3.5 h-3.5" />
+              <span>+ Add Property</span>
+            </button>
+
+            {/* Direct Add Project Button */}
+            <button
+              id="top-bar-add-project-btn"
+              onClick={() => setActiveTab('projects')}
+              className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-[#1E4FA8] hover:bg-[#163c80] text-white text-[11px] sm:text-xs font-black flex items-center gap-1 sm:gap-1.5 shadow-sm transition-all cursor-pointer"
+              title="Add a new Mega Builder Project"
+            >
+              <Building2 className="w-3.5 h-3.5" />
+              <span>+ Add Project</span>
+            </button>
+
             {/* Quick Add Dropdown */}
             <div className="relative">
               <button
                 onClick={() => setQuickAddMenuOpen(!quickAddMenuOpen)}
-                className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black flex items-center gap-1.5 shadow-md transition-all"
+                className="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold flex items-center gap-1 border border-slate-700 transition-all cursor-pointer"
+                title="More quick actions"
               >
-                <Plus className="w-4 h-4" />
-                <span className="hidden sm:inline">+ Quick Add</span>
+                <Plus className="w-4 h-4 text-amber-400" />
+                <span className="hidden lg:inline">More</span>
               </button>
               {quickAddMenuOpen && (
                 <div className="absolute right-0 mt-2 w-52 bg-white rounded-2xl shadow-2xl border border-slate-200 py-2 z-50 text-slate-800 animate-in fade-in duration-150">
@@ -284,13 +308,13 @@ export const SuperAdminHub: React.FC = () => {
                     onClick={() => { setActiveTab('properties'); setQuickAddMenuOpen(false); }}
                     className="w-full px-4 py-2 text-left text-xs font-bold hover:bg-blue-50 hover:text-[#1E4FA8] flex items-center gap-2"
                   >
-                    <Building2 className="w-4 h-4 text-blue-600" /> + Add Property
+                    <Home className="w-4 h-4 text-emerald-600" /> + Add Property (Sale/Rent)
                   </button>
                   <button
                     onClick={() => { setActiveTab('projects'); setQuickAddMenuOpen(false); }}
                     className="w-full px-4 py-2 text-left text-xs font-bold hover:bg-blue-50 hover:text-[#1E4FA8] flex items-center gap-2"
                   >
-                    <Landmark className="w-4 h-4 text-indigo-600" /> + Add Mega Project
+                    <Building2 className="w-4 h-4 text-blue-600" /> + Add Mega Project
                   </button>
                   <button
                     onClick={() => { setActiveTab('services'); setQuickAddMenuOpen(false); }}
@@ -565,7 +589,7 @@ export const SuperAdminHub: React.FC = () => {
 
           {/* TAB 4: MEGA PROJECTS */}
           {activeTab === 'projects' && (
-            <ProjectsPropertiesManager />
+            <ProjectsManager />
           )}
 
           {/* TAB 5: SERVICES */}

@@ -72,6 +72,15 @@ export const INITIAL_CMS_PAGES: Record<string, CmsPageData> = {
         ctaText: 'View All Projects',
         ctaLink: 'projects'
       },
+      featuredProperties: {
+        id: 'featuredProperties',
+        name: 'Featured Properties Carousel',
+        badge: 'Handpicked Direct Listings',
+        heading: 'Featured Properties in Sambhajinagar',
+        subheading: 'Verified flats, row houses, and commercial spaces with 0% brokerage and genuine owner contacts.',
+        ctaText: 'Explore All Properties',
+        ctaLink: 'properties'
+      },
       statsCounter: {
         id: 'statsCounter',
         name: 'Platform Growth Metrics',

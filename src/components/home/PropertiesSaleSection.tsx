@@ -27,7 +27,7 @@ export const PropertiesSaleSection: React.FC = () => {
   const [activeTab, setActiveTab] = useState<PropertyTabType>('Residential');
 
   // Custom CMS section config fallback
-  const homeData = cmsPages?.home?.data || {};
+  const homeData = (cmsPages?.home as any)?.data || {};
   const sectionTitle = homeData.propertiesSaleTitle || 'Properties on Sale';
   const sectionSubtitle = homeData.propertiesSaleSubtitle || '100% verified title deeds, 0% brokerage direct owner listings, and collector sanctioned plots in Sambhajinagar.';
 
@@ -112,21 +112,21 @@ export const PropertiesSaleSection: React.FC = () => {
   return (
     <section 
       id="properties-on-sale-section"
-      className="py-10 sm:py-14 bg-slate-50/70 border-b border-slate-200/80 transition-colors w-full overflow-hidden"
+      className="py-3.5 sm:py-8 bg-slate-50/70 border-b border-slate-200/80 transition-colors w-full overflow-hidden"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+      <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 space-y-3 sm:space-y-4">
         
         {/* SECTION HEADER: Title & View All */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-          <div className="space-y-1.5">
-            <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-blue-50 text-[#1E4FA8] text-xs font-black uppercase tracking-wider border border-blue-200/60">
-              <Building2 className="w-3.5 h-3.5 text-[#F2621E]" />
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 sm:gap-4">
+          <div className="space-y-0.5 sm:space-y-1">
+            <div className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full bg-blue-50 text-[#1E4FA8] text-[9px] sm:text-xs font-black uppercase tracking-wider border border-blue-200/60">
+              <Building2 className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[#F2621E]" />
               <span>Direct Owner & Verified Resale</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+            <h2 className="text-base sm:text-xl md:text-2xl font-black text-slate-900 tracking-tight">
               {homeHeading || sectionTitle}
             </h2>
-            <p className="text-xs sm:text-sm text-slate-600 font-medium max-w-2xl">
+            <p className="text-[10px] sm:text-xs text-slate-600 font-medium max-w-2xl line-clamp-1 sm:line-clamp-none">
               {homeSubheading || sectionSubtitle}
             </p>
           </div>
@@ -135,18 +135,18 @@ export const PropertiesSaleSection: React.FC = () => {
           <button
             id="view-all-sale-properties-btn"
             onClick={() => setActiveView('properties')}
-            className="inline-flex items-center space-x-1.5 text-xs font-black text-[#1E4FA8] hover:text-[#F2621E] transition-colors cursor-pointer group shrink-0 py-1"
+            className="inline-flex items-center space-x-1 text-[11px] sm:text-xs font-black text-[#1E4FA8] hover:text-[#F2621E] transition-colors cursor-pointer group shrink-0 py-1"
           >
-            <span>View All Properties</span>
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            <span>View All</span>
+            <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
 
         {/* TAB TOGGLE: Residential / Commercial / Industrial / Plots / Land */}
-        <div className="flex items-center justify-between gap-3 border-b border-slate-200 pb-3">
+        <div className="flex items-center justify-between gap-2 sm:gap-3 border-b border-slate-200 pb-2 sm:pb-3">
           <div 
             id="property-category-tabs"
-            className="flex items-center space-x-2 overflow-x-auto no-scrollbar py-1 w-full sm:w-auto"
+            className="flex items-center space-x-1 sm:space-x-2 overflow-x-auto no-scrollbar py-0.5 sm:py-1 w-full sm:w-auto"
           >
             {tabs.map((tab) => {
               const isActive = activeTab === tab.id;
@@ -155,7 +155,7 @@ export const PropertiesSaleSection: React.FC = () => {
                   key={tab.id}
                   id={`sale-tab-${tab.id.toLowerCase()}`}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center space-x-1.5 ${
+                  className={`px-2.5 sm:px-4 py-1 sm:py-2 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center space-x-1 ${
                     isActive
                       ? 'bg-[#1E4FA8] text-white shadow-sm ring-2 ring-[#1E4FA8]/20'
                       : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200/80 hover:bg-slate-100/80'
@@ -173,11 +173,8 @@ export const PropertiesSaleSection: React.FC = () => {
           </div>
         </div>
 
-        {/* COMBINED LAYOUT: Main Grid (Left 8-9 cols) + Featured Sidebar (Right 3-4 cols desktop, bottom on mobile) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          
-          {/* MAIN PROPERTIES GRID (8 Cards: 4 columns x 2 rows on desktop, 2-col on mobile) */}
-          <div className="lg:col-span-8 xl:col-span-8 space-y-4">
+        {/* MAIN PROPERTIES DIRECTORY GRID (Full Width) */}
+        <div className="w-full space-y-4">
             
             {mainCards.length === 0 ? (
               <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center space-y-3">
@@ -195,7 +192,7 @@ export const PropertiesSaleSection: React.FC = () => {
             ) : (
               <div 
                 id="properties-sale-grid"
-                className="grid grid-rows-2 grid-flow-col auto-cols-[minmax(220px,1fr)] sm:auto-cols-[minmax(250px,1fr)] gap-3 sm:gap-4 overflow-x-auto scrollbar-thin scrollbar-thumb-[var(--primary)]/40 scrollbar-track-[var(--surface-secondary)] snap-x snap-mandatory pb-2"
+                className="grid grid-rows-2 grid-flow-col auto-cols-[minmax(180px,1fr)] sm:auto-cols-[minmax(250px,1fr)] gap-2.5 sm:gap-4 overflow-x-auto scrollbar-thin scrollbar-thumb-[var(--primary)]/40 scrollbar-track-[var(--surface-secondary)] snap-x snap-mandatory pb-2"
               >
                 {mainCards.map((property, index) => {
                   const coverImage = property.images && property.images.length > 0
@@ -305,117 +302,7 @@ export const PropertiesSaleSection: React.FC = () => {
 
           </div>
 
-          {/* FEATURED PROPERTIES SIDEBAR (Right column on desktop ���1024px, full-width row below grid on mobile) */}
-          <div 
-            id="featured-properties-sidebar"
-            className="lg:col-span-4 xl:col-span-4 w-full bg-white p-4 sm:p-5 rounded-3xl border border-slate-200/90 shadow-2xs space-y-4"
-          >
-            
-            {/* Sidebar Header with Subtle Attention-Grabbing Pulse / Glow Animation */}
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <div className="flex items-center space-x-2">
-                {/* Subtle attention-grabbing pulse badge */}
-                <span className="relative flex h-3 w-3">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#F2621E] opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-[#F2621E] shadow-sm"></span>
-                </span>
-                
-                <h3 className="font-black text-sm text-slate-900 uppercase tracking-wider flex items-center space-x-1.5">
-                  <Flame className="w-4 h-4 text-[#F2621E] fill-[#F2621E]" />
-                  <span>Featured Properties</span>
-                </h3>
-              </div>
-
-              <span className="text-[10px] font-black text-amber-900 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200 shadow-2xs">
-                Hot Picks
-              </span>
-            </div>
-
-            {/* 2 Large Stacked Property Cards (Desktop stacked, Mobile horizontal-scroll / stacked) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
-              {finalFeaturedList.map((featured, idx) => {
-                const featuredImg = featured.images && featured.images.length > 0
-                  ? featured.images[0]
-                  : 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1200&q=80';
-
-                return (
-                  <div
-                    key={featured.id || idx}
-                    id={`featured-card-${featured.id || idx}`}
-                    onClick={() => navigateToPropertyDetail(featured.id)}
-                    className="group bg-slate-50/70 rounded-2xl border border-slate-200 overflow-hidden hover:-translate-y-1 hover:border-[#F2621E] hover:shadow-md transition-all duration-300 cursor-pointer flex flex-col"
-                  >
-                    {/* Bigger Photo with Gradient & Highlights */}
-                    <div className="relative aspect-16/10 w-full overflow-hidden bg-slate-900">
-                      <img
-                        src={featuredImg}
-                        alt={featured.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        referrerPolicy="no-referrer"
-                        loading="lazy"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/30 to-transparent" />
-                      
-                      {/* Top Badges */}
-                      <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
-                        <div className="bg-[#F2621E] text-white text-[10px] font-black px-2.5 py-1 rounded-lg shadow-sm flex items-center space-x-1">
-                          <Sparkles className="w-3 h-3" />
-                          <span>Featured Listing</span>
-                        </div>
-
-                        {featured.zeroBrokerage && (
-                          <div className="bg-emerald-600 text-white text-[10px] font-black px-2 py-0.5 rounded-md shadow-xs">
-                            0% Brokerage
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Bottom Info Overlay */}
-                      <div className="absolute bottom-3 left-3 right-3 text-white space-y-0.5">
-                        <div className="text-base sm:text-lg font-black text-amber-300 tracking-tight">
-                          {featured.priceDisplay || `₹ ${(featured.price / 100000).toFixed(1)} L`}
-                        </div>
-                        <div className="text-xs font-medium text-slate-200 truncate">
-                          {getBhkOrTypeDisplay(featured)} • {featured.carpetArea ? `${featured.carpetArea.toLocaleString('en-IN')} sq.ft` : ''} • {featured.locality}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Card Content & "Property Details" Button */}
-                    <div className="p-3.5 space-y-2.5 bg-white flex-1 flex flex-col justify-between">
-                      <div className="space-y-1">
-                        <h4 className="font-black text-xs sm:text-sm text-slate-900 group-hover:text-[#1E4FA8] transition-colors line-clamp-1">
-                          {featured.title}
-                        </h4>
-                        <p className="text-[11px] text-slate-500 flex items-center space-x-1 truncate">
-                          <MapPin className="w-3 h-3 text-[#F2621E] shrink-0" />
-                          <span className="truncate">{featured.address || featured.locality}</span>
-                        </p>
-                      </div>
-
-                      {/* Clickable Action: "Property Details" */}
-                      <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between">
-                        <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
-                          {featured.verified ? 'Verified Property' : 'Direct Owner'}
-                        </span>
-                        
-                        <div className="inline-flex items-center space-x-1 text-xs font-black text-[#F2621E] group-hover:text-[#d85517] transition-colors">
-                          <span>Property Details</span>
-                          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                        </div>
-                      </div>
-
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-          </div>
-
         </div>
-
-      </div>
 
       {/* Interactive Property Detail Modal */}
       <PropertyDetailModal

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useHomeCopy } from './homeEditorUtils';
 import { useApp } from '../../context/AppContext';
 import { 
@@ -14,7 +14,8 @@ import {
   Compass, 
   CheckCircle2, 
   AlertCircle,
-  Users,
+  ChevronLeft,
+  ChevronRight,
   Send
 } from 'lucide-react';
 
@@ -28,6 +29,7 @@ export const KnowledgeHubSection: React.FC<KnowledgeHubSectionProps> = () => {
     knowledgeHubConfig, 
     currentUser, 
     activeRole, 
+    cmsBlogs,
     setActiveView, 
     setActiveRole,
     getBrokerAccessStatus, 
@@ -41,6 +43,7 @@ export const KnowledgeHubSection: React.FC<KnowledgeHubSectionProps> = () => {
   const [requestEmail, setRequestEmail] = useState(currentUser?.email || '');
   const [requestAgency, setRequestAgency] = useState('');
   const [requestRera, setRequestRera] = useState('');
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // Determine broker authorization status
   const isBroker = activeRole === 'broker';
@@ -49,9 +52,15 @@ export const KnowledgeHubSection: React.FC<KnowledgeHubSectionProps> = () => {
   const isApproved = isAdmin || (isBroker && brokerStatus === 'approved');
   const isPending = isBroker && brokerStatus === 'pending';
 
+  const handleScroll = (direction: 'left' | 'right') => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = direction === 'left' ? -290 : 290;
+      scrollContainerRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
+
   const handleCard1Click = () => {
     if (!currentUser && !isBroker) {
-      // 1. Not logged in -> Route to Broker Auth / Broker Hub
       setActiveRole('broker');
       setActiveView('broker-hub');
       showToast('Please sign in or register as an Auricity Broker to access private masterclasses.', 'info');
@@ -59,18 +68,15 @@ export const KnowledgeHubSection: React.FC<KnowledgeHubSectionProps> = () => {
     }
 
     if (isApproved) {
-      // 2. Approved -> Enter private broker knowledge hub
       setActiveView('broker-knowledge-hub');
       return;
     }
 
     if (isPending) {
-      // 3. Pending
       showToast('Your broker access request is currently under Super Admin review. You will receive an instant unlock once verified.', 'info');
       return;
     }
 
-    // 4. Logged in as broker, not requested yet -> Open request modal
     setShowBrokerRequestModal(true);
   };
 
@@ -95,192 +101,354 @@ export const KnowledgeHubSection: React.FC<KnowledgeHubSectionProps> = () => {
 
   const { titleCard, card1Broker, card2BuyersGuide, card3TrendsNews } = knowledgeHubConfig;
 
+  // Filter published blogs from CMS
+  const publishedBlogs = (cmsBlogs || []).filter(b => b.published !== false);
+
   return (
-    <section className="py-12 bg-[var(--surface-secondary)]/50 border-y border-[var(--border)] relative overflow-hidden">
+    <section className="py-6 sm:py-12 bg-[var(--surface-secondary)]/50 border-y border-[var(--border)] relative overflow-hidden" id="knowledge-hub-section">
       {/* Background Decorative Glow */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-[#1E4FA8]/5 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
       <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#F2621E]/5 rounded-full blur-3xl pointer-events-none -ml-20 -mb-20" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 relative z-10 space-y-4 sm:space-y-6">
         
-        {/* Main Grid: Title Card on Left + 3 Content Cards on Right */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-          
-          {/* LEFT: TITLE CARD (Brand Blue Background) */}
-          <div className="lg:col-span-3 bg-gradient-to-br from-[#1E4FA8] via-[#163a7d] to-[#0f2857] text-white rounded-3xl p-6 sm:p-8 flex flex-col justify-between shadow-xl relative overflow-hidden group">
-            {/* Subtle overlay effect */}
-            <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-[#F2621E]/20 rounded-full blur-2xl group-hover:scale-125 transition-transform duration-700 pointer-events-none" />
-            <div className="absolute top-0 right-0 p-6 opacity-15 pointer-events-none">
-              <BookOpen className="w-24 h-24 text-white" />
+        {/* Section Header */}
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4">
+          <div className="space-y-1 max-w-2xl">
+            <div className="inline-flex items-center space-x-1 bg-[var(--primary-light)] text-[var(--primary)] px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-wider border border-[var(--primary)]/20 shadow-2xs">
+              <Sparkles className="w-3 h-3 text-[var(--secondary)]" />
+              <span>{titleCard?.badge || "Auricity Knowledge Hub"}</span>
+            </div>
+            <h2 className="text-base sm:text-xl md:text-2xl font-black text-[var(--text-primary)] tracking-tight">
+              {homeHeading || titleCard?.heading || "Auricity's Knowledge Hub"}
+            </h2>
+            <p className="text-[10px] sm:text-xs text-[var(--text-secondary)] font-medium line-clamp-1 sm:line-clamp-none">
+              {homeSubheading || titleCard?.description || 'Guides, market insights and practical real-estate knowledge for buyers, investors, and brokers.'}
+            </p>
+          </div>
+
+          {/* Navigation Controls & Explore All */}
+          <div className="flex items-center space-x-2 sm:space-x-3 self-start sm:self-auto">
+            <button
+              onClick={() => setActiveView('knowledge-hub')}
+              className="inline-flex items-center space-x-1 text-[11px] sm:text-xs font-bold text-[var(--primary)] hover:text-[var(--secondary)] transition-colors group cursor-pointer mr-1"
+            >
+              <span>{titleCard?.ctaText || 'Explore Knowledge Hub'}</span>
+              <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 transform group-hover:translate-x-1 transition-transform" />
+            </button>
+
+            {/* Scroll buttons */}
+            <div className="flex items-center space-x-1">
+              <button
+                type="button"
+                onClick={() => handleScroll('left')}
+                className="w-6 h-6 sm:w-8 sm:h-8 rounded-full border border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--surface-secondary)] text-[var(--text-primary)] flex items-center justify-center transition-all cursor-pointer shadow-xs hover:scale-105 active:scale-95"
+                title="Scroll Left"
+                aria-label="Scroll Left"
+              >
+                <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => handleScroll('right')}
+                className="w-6 h-6 sm:w-8 sm:h-8 rounded-full border border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--surface-secondary)] text-[var(--text-primary)] flex items-center justify-center transition-all cursor-pointer shadow-xs hover:scale-105 active:scale-95"
+                title="Scroll Right"
+                aria-label="Scroll Right"
+              >
+                <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Horizontal Scrolling Cards Carousel */}
+        <div 
+          ref={scrollContainerRef}
+          className="flex gap-2.5 sm:gap-4 overflow-x-auto scroll-smooth snap-x snap-mandatory py-1 px-0.5 pb-2 scrollbar-thin scrollbar-thumb-[var(--primary)]/40 scrollbar-track-[var(--surface)]"
+        >
+          {/* CARD 0: TITLE & INTRO CARD */}
+          <div className="w-[190px] sm:w-[245px] md:w-[290px] shrink-0 snap-start bg-gradient-to-br from-[#1E4FA8] via-[#163a7d] to-[#0f2857] text-white rounded-xl sm:rounded-3xl p-3 sm:p-5 flex flex-col justify-between shadow-md relative overflow-hidden group border border-white/10">
+            <div className="absolute -right-10 -bottom-10 w-32 h-32 bg-[#F2621E]/20 rounded-full blur-2xl group-hover:scale-125 transition-transform duration-700 pointer-events-none" />
+            <div className="absolute top-0 right-0 p-3 opacity-15 pointer-events-none">
+              <BookOpen className="w-14 h-14 sm:w-20 sm:h-20 text-white" />
             </div>
 
-            <div className="relative z-10 space-y-4">
-              <span className="inline-flex items-center space-x-1.5 bg-white/15 backdrop-blur-md text-white text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full border border-white/20">
-                <Sparkles className="w-3.5 h-3.5 text-[#F2621E]" />
-                <span>{titleCard.badge || "Auricity's Knowledge Hub"}</span>
+            <div className="relative z-10 space-y-2 sm:space-y-3">
+              <span className="inline-flex items-center space-x-1 bg-white/15 backdrop-blur-md text-white text-[8px] sm:text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border border-white/20">
+                <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[#F2621E]" />
+                <span>Knowledge & Intelligence</span>
               </span>
 
               <div>
-                <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white leading-tight">
-                  {homeHeading || titleCard.heading || "Auricity's Knowledge Hub"}
-                </h2>
-                <h3 className="text-sm font-bold text-blue-200 mt-1">
-                  {titleCard.subheading || 'Blogs, News & Articles'}
+                <h3 className="text-sm sm:text-lg md:text-xl font-black tracking-tight text-white leading-tight">
+                  {titleCard?.heading || "Auricity's Knowledge Hub"}
                 </h3>
+                <h4 className="text-[10px] sm:text-xs font-bold text-blue-200 mt-0.5">
+                  {titleCard?.subheading || 'Blogs, News & Articles'}
+                </h4>
               </div>
 
-              <p className="text-xs text-blue-100/90 leading-relaxed font-normal">
-                {homeSubheading || titleCard.description || 'Expert insights, RERA compliance advisories, local market trends, and private training modules for certified brokers.'}
+              <p className="text-[9px] sm:text-xs text-blue-100/90 leading-relaxed font-normal line-clamp-3">
+                {titleCard?.description || 'Expert insights, RERA compliance advisories, local market trends, and private training modules for certified brokers.'}
               </p>
             </div>
 
-            <div className="relative z-10 pt-6 mt-4 border-t border-white/15">
+            <div className="relative z-10 pt-2 sm:pt-4 mt-2 sm:mt-3 border-t border-white/15">
               <button
                 onClick={() => setActiveView('knowledge-hub')}
-                className="w-full bg-[#F2621E] hover:bg-[#d95316] text-white font-black text-xs px-4 py-3 rounded-2xl shadow-lg transition-all flex items-center justify-center space-x-2 cursor-pointer group/btn"
+                className="w-full bg-[#F2621E] hover:bg-[#d95316] text-white font-black text-[10px] sm:text-xs px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-lg sm:rounded-xl shadow-xs transition-all flex items-center justify-center space-x-1 sm:space-x-1.5 cursor-pointer group/btn"
               >
-                <span>{titleCard.ctaText || 'Explore Knowledge Hub'}</span>
-                <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                <span>{titleCard?.ctaText || 'Explore Hub'}</span>
+                <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 group-hover/btn:translate-x-1 transition-transform" />
               </button>
             </div>
           </div>
 
-          {/* RIGHT: 3 CONTENT CARDS ROW */}
-          <div className="lg:col-span-9 grid grid-cols-1 md:grid-cols-3 gap-6">
-            
-            {/* CARD 1: AURICITY BROKERS CAREER & DEVELOPMENT (Gated / Private) */}
-            <div className="bg-[var(--surface)] rounded-3xl border border-[var(--border)] overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between group relative">
-              {/* Top Cover Image with Gated Badge */}
-              <div className="relative h-44 overflow-hidden bg-slate-900">
-                <img
-                  src={card1Broker.coverImage}
-                  alt={card1Broker.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-                
-                {/* Gated Status Badge */}
-                <div className="absolute top-3 left-3">
-                  <span className={`inline-flex items-center space-x-1.5 text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shadow-md backdrop-blur-md ${
-                    isApproved 
-                      ? 'bg-emerald-500/90 text-white border border-emerald-400/40' 
-                      : isPending
-                      ? 'bg-amber-500/90 text-white border border-amber-400/40'
-                      : 'bg-red-500/90 text-white border border-red-400/40'
-                  }`}>
-                    {isApproved ? (
-                      <>
-                        <Unlock className="w-3 h-3" />
-                        <span>Broker Unlocked</span>
-                      </>
-                    ) : isPending ? (
-                      <>
-                        <AlertCircle className="w-3 h-3" />
-                        <span>Approval Pending</span>
-                      </>
-                    ) : (
-                      <>
-                        <Lock className="w-3 h-3" />
-                        <span>{card1Broker.badge || 'Private & Gated'}</span>
-                      </>
-                    )}
-                  </span>
-                </div>
-
-                <div className="absolute bottom-3 left-3 right-3 text-white">
-                  <span className="text-[10px] font-bold text-amber-300 uppercase tracking-wider flex items-center space-x-1">
-                    <ShieldCheck className="w-3.5 h-3.5" />
-                    <span>MahaRERA & Broker Academy</span>
-                  </span>
-                </div>
+          {/* CARD 1: AURICITY BROKERS CAREER & DEVELOPMENT (Gated / Private) */}
+          <div className="w-[190px] sm:w-[245px] md:w-[290px] shrink-0 snap-start bg-[var(--surface)] rounded-xl sm:rounded-2xl border border-[var(--border)] overflow-hidden shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col justify-between group relative">
+            {/* Top Cover Image with Gated Badge */}
+            <div className="relative h-24 sm:h-36 overflow-hidden bg-slate-900">
+              <img
+                src={card1Broker.coverImage}
+                alt={card1Broker.title}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+              
+              {/* Gated Status Badge */}
+              <div className="absolute top-2 left-2">
+                <span className={`inline-flex items-center space-x-1 text-[8px] sm:text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full shadow-md backdrop-blur-md ${
+                  isApproved 
+                    ? 'bg-emerald-500/90 text-white border border-emerald-400/40' 
+                    : isPending
+                    ? 'bg-amber-500/90 text-white border border-amber-400/40'
+                    : 'bg-red-500/90 text-white border border-red-400/40'
+                }`}>
+                  {isApproved ? (
+                    <>
+                      <Unlock className="w-2.5 h-2.5" />
+                      <span>Unlocked</span>
+                    </>
+                  ) : isPending ? (
+                    <>
+                      <AlertCircle className="w-2.5 h-2.5" />
+                      <span>Pending</span>
+                    </>
+                  ) : (
+                    <>
+                      <Lock className="w-2.5 h-2.5" />
+                      <span>{card1Broker.badge || 'Gated'}</span>
+                    </>
+                  )}
+                </span>
               </div>
 
-              {/* Card Body */}
-              <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-                <div className="space-y-2">
-                  <h4 className="text-base font-black text-[var(--text-primary)] group-hover:text-[#1E4FA8] transition-colors leading-snug line-clamp-2">
-                    {card1Broker.title}
-                  </h4>
-                  <p className="text-xs text-[var(--text-secondary)] leading-relaxed line-clamp-3">
-                    {card1Broker.description}
-                  </p>
+              <div className="absolute bottom-1.5 left-2 right-2 text-white">
+                <span className="text-[8px] sm:text-[9px] font-bold text-amber-300 uppercase tracking-wider flex items-center space-x-1">
+                  <ShieldCheck className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                  <span>MahaRERA Academy</span>
+                </span>
+              </div>
+            </div>
+
+            {/* Card Body */}
+            <div className="p-2.5 sm:p-4 flex-1 flex flex-col justify-between space-y-2 sm:space-y-3">
+              <div className="space-y-0.5 sm:space-y-1">
+                <h4 className="text-xs sm:text-sm font-black text-[var(--text-primary)] group-hover:text-[#1E4FA8] transition-colors leading-snug line-clamp-2">
+                  {card1Broker.title}
+                </h4>
+                <p className="text-[9px] sm:text-xs text-[var(--text-secondary)] leading-relaxed line-clamp-2">
+                  {card1Broker.description}
+                </p>
+              </div>
+
+              {/* Card Action Button */}
+              <div className="pt-1.5 sm:pt-2 border-t border-[var(--border)]">
+                {(!currentUser && !isBroker) ? (
+                  <button
+                    onClick={handleCard1Click}
+                    className="w-full bg-[#1E4FA8] hover:bg-[#163a7d] text-white text-[10px] sm:text-xs font-black py-1.5 sm:py-2 px-2.5 rounded-lg sm:rounded-xl shadow-xs transition-all flex items-center justify-center space-x-1 cursor-pointer"
+                  >
+                    <Lock className="w-3 h-3 text-amber-300" />
+                    <span>{card1Broker.buttonTextNotLoggedIn || 'Request Access'}</span>
+                  </button>
+                ) : isApproved ? (
+                  <button
+                    onClick={handleCard1Click}
+                    className="w-full bg-[#F2621E] hover:bg-[#d95316] text-white text-[10px] sm:text-xs font-black py-1.5 sm:py-2 px-2.5 rounded-lg sm:rounded-xl shadow-xs transition-all flex items-center justify-center space-x-1 cursor-pointer"
+                  >
+                    <Unlock className="w-3 h-3" />
+                    <span>{card1Broker.buttonTextApproved || 'Enter Hub'}</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </button>
+                ) : isPending ? (
+                  <button
+                    disabled
+                    className="w-full bg-amber-100 text-amber-800 text-[10px] sm:text-xs font-black py-1.5 sm:py-2 px-2.5 rounded-lg sm:rounded-xl border border-amber-300 flex items-center justify-center space-x-1 opacity-90 cursor-not-allowed"
+                  >
+                    <Clock className="w-3 h-3 text-amber-600 animate-spin" />
+                    <span>Pending Approval</span>
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleCard1Click}
+                    className="w-full btn-theme-primary text-white text-[10px] sm:text-xs font-black py-1.5 sm:py-2 px-2.5 rounded-lg sm:rounded-xl shadow-xs transition-all flex items-center justify-center space-x-1 cursor-pointer"
+                  >
+                    <ShieldCheck className="w-3 h-3" />
+                    <span>Request Access</span>
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* CARD 2: REAL ESTATE BUYERS GUIDE (PUBLIC) */}
+          <div className="w-[190px] sm:w-[245px] md:w-[290px] shrink-0 snap-start bg-[var(--surface)] rounded-xl sm:rounded-2xl border border-[var(--border)] overflow-hidden shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col justify-between group">
+            {/* Top Cover Image */}
+            <div className="relative h-24 sm:h-36 overflow-hidden bg-slate-100">
+              <img
+                src={card2BuyersGuide.coverImage}
+                alt={card2BuyersGuide.title}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+              
+              {/* Badge */}
+              <div className="absolute top-2 left-2">
+                <span className="inline-flex items-center space-x-1 bg-emerald-600/90 backdrop-blur-md text-white text-[8px] sm:text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full shadow-md">
+                  <FileText className="w-2.5 h-2.5" />
+                  <span>{card2BuyersGuide.badge || 'Buyers Guide'}</span>
+                </span>
+              </div>
+
+              <div className="absolute bottom-1.5 left-2 right-2 text-white">
+                <span className="text-[8px] sm:text-[9px] font-bold text-emerald-300 uppercase tracking-wider flex items-center space-x-1">
+                  <Compass className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                  <span>Flats, Plots & Resale</span>
+                </span>
+              </div>
+            </div>
+
+            {/* Card Body */}
+            <div className="p-2.5 sm:p-4 flex-1 flex flex-col justify-between space-y-2 sm:space-y-3">
+              <div className="space-y-0.5 sm:space-y-1">
+                <h4 className="text-xs sm:text-sm font-black text-[var(--text-primary)] group-hover:text-[#1E4FA8] transition-colors leading-snug line-clamp-2">
+                  {card2BuyersGuide.title}
+                </h4>
+                <p className="text-[9px] sm:text-xs text-[var(--text-secondary)] leading-relaxed line-clamp-2">
+                  {card2BuyersGuide.description}
+                </p>
+              </div>
+
+              {/* Action */}
+              <div className="pt-1.5 sm:pt-2 border-t border-[var(--border)]">
+                <button
+                  onClick={() => setActiveView('knowledge-hub')}
+                  className="w-full bg-[var(--surface-secondary)] hover:bg-[#1E4FA8] text-[var(--text-primary)] hover:text-white text-[10px] sm:text-xs font-black py-1.5 sm:py-2 px-2.5 rounded-lg sm:rounded-xl border border-[var(--border)] hover:border-[#1E4FA8] transition-all flex items-center justify-center space-x-1 cursor-pointer"
+                >
+                  <span>Read Guide</span>
+                  <ArrowRight className="w-3 h-3" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* CARD 3: REAL ESTATE TRENDS & NEWS (PUBLIC) */}
+          <div className="w-[190px] sm:w-[245px] md:w-[290px] shrink-0 snap-start bg-[var(--surface)] rounded-xl sm:rounded-2xl border border-[var(--border)] overflow-hidden shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col justify-between group">
+            {/* Top Cover Image */}
+            <div className="relative h-24 sm:h-36 overflow-hidden bg-slate-100">
+              <img
+                src={card3TrendsNews.coverImage}
+                alt={card3TrendsNews.title}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+              
+              {/* Badge */}
+              <div className="absolute top-2 left-2">
+                <span className="inline-flex items-center space-x-1 bg-[#1E4FA8]/90 backdrop-blur-md text-white text-[8px] sm:text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full shadow-md">
+                  <TrendingUp className="w-2.5 h-2.5" />
+                  <span>{card3TrendsNews.badge || 'Insights'}</span>
+                </span>
+              </div>
+
+              <div className="absolute bottom-1.5 left-2 right-2 text-white">
+                <span className="text-[8px] sm:text-[9px] font-bold text-blue-200 uppercase tracking-wider flex items-center space-x-1">
+                  <TrendingUp className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                  <span>AURIC & City Growth</span>
+                </span>
+              </div>
+            </div>
+
+            {/* Card Body */}
+            <div className="p-2.5 sm:p-4 flex-1 flex flex-col justify-between space-y-2 sm:space-y-3">
+              <div className="space-y-0.5 sm:space-y-1">
+                <h4 className="text-xs sm:text-sm font-black text-[var(--text-primary)] group-hover:text-[#1E4FA8] transition-colors leading-snug line-clamp-2">
+                  {card3TrendsNews.title}
+                </h4>
+                <p className="text-[9px] sm:text-xs text-[var(--text-secondary)] leading-relaxed line-clamp-2">
+                  {card3TrendsNews.description}
+                </p>
+              </div>
+
+              {/* Action */}
+              <div className="pt-1.5 sm:pt-2 border-t border-[var(--border)]">
+                <button
+                  onClick={() => setActiveView('knowledge-hub')}
+                  className="w-full bg-[var(--surface-secondary)] hover:bg-[#1E4FA8] text-[var(--text-primary)] hover:text-white text-[10px] sm:text-xs font-black py-1.5 sm:py-2 px-2.5 rounded-lg sm:rounded-xl border border-[var(--border)] hover:border-[#1E4FA8] transition-all flex items-center justify-center space-x-1 cursor-pointer"
+                >
+                  <span>Read News</span>
+                  <ArrowRight className="w-3 h-3" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* ADDITIONAL BLOG POSTS FROM CMS */}
+          {publishedBlogs.slice(0, 4).map((blog) => (
+            <div 
+              key={blog.id}
+              className="w-[190px] sm:w-[245px] md:w-[290px] shrink-0 snap-start bg-[var(--surface)] rounded-xl sm:rounded-2xl border border-[var(--border)] overflow-hidden shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col justify-between group"
+            >
+              {/* Cover Image */}
+              <div className="relative h-24 sm:h-36 overflow-hidden bg-slate-100">
+                <img
+                  src={blog.coverImage || 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80'}
+                  alt={blog.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                
+                {/* Badge & Read Time */}
+                <div className="absolute top-2 left-2">
+                  <span className="inline-flex items-center space-x-1 bg-purple-600/90 backdrop-blur-md text-white text-[8px] sm:text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full shadow-md">
+                    <span>{blog.category || 'Article'}</span>
+                  </span>
                 </div>
 
-                {/* Card Action Button */}
-                <div className="pt-2 border-t border-[var(--border)]">
-                  {(!currentUser && !isBroker) ? (
-                    <button
-                      onClick={handleCard1Click}
-                      className="w-full bg-[#1E4FA8] hover:bg-[#163a7d] text-white text-xs font-black py-2.5 px-4 rounded-xl shadow-xs transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
-                    >
-                      <Lock className="w-3.5 h-3.5 text-amber-300" />
-                      <span>{card1Broker.buttonTextNotLoggedIn || 'Get Access'}</span>
-                    </button>
-                  ) : isApproved ? (
-                    <button
-                      onClick={handleCard1Click}
-                      className="w-full bg-[#F2621E] hover:bg-[#d95316] text-white text-xs font-black py-2.5 px-4 rounded-xl shadow-md transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
-                    >
-                      <Unlock className="w-3.5 h-3.5" />
-                      <span>{card1Broker.buttonTextApproved || 'Enter Knowledge Hub'}</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </button>
-                  ) : isPending ? (
-                    <button
-                      disabled
-                      className="w-full bg-amber-100 text-amber-800 text-xs font-black py-2.5 px-4 rounded-xl border border-amber-300 flex items-center justify-center space-x-1.5 opacity-90 cursor-not-allowed"
-                    >
-                      <Clock className="w-3.5 h-3.5 text-amber-600 animate-spin" />
-                      <span>{card1Broker.buttonTextPending || 'Pending Admin Approval'}</span>
-                    </button>
-                  ) : (
-                    <button
-                      onClick={handleCard1Click}
-                      className="w-full btn-theme-primary text-white text-xs font-black py-2.5 px-4 rounded-xl shadow-xs transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
-                    >
-                      <ShieldCheck className="w-3.5 h-3.5" />
-                      <span>{card1Broker.buttonTextRequestAccess || 'Request Access'}</span>
-                    </button>
+                <div className="absolute bottom-1.5 left-2 right-2 text-white flex items-center justify-between text-[8px] sm:text-[9px]">
+                  <span className="font-bold text-amber-200 flex items-center gap-0.5">
+                    <Clock className="w-2.5 h-2.5" />
+                    <span>{blog.readTimeMinutes || 4}m read</span>
+                  </span>
+                  {blog.publishedAt && (
+                    <span className="opacity-80">{blog.publishedAt}</span>
                   )}
                 </div>
               </div>
-            </div>
-
-            {/* CARD 2: REAL ESTATE BUYERS GUIDE (PUBLIC) */}
-            <div className="bg-[var(--surface)] rounded-3xl border border-[var(--border)] overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
-              {/* Top Cover Image */}
-              <div className="relative h-44 overflow-hidden bg-slate-100">
-                <img
-                  src={card2BuyersGuide.coverImage}
-                  alt={card2BuyersGuide.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                
-                {/* Badge */}
-                <div className="absolute top-3 left-3">
-                  <span className="inline-flex items-center space-x-1 bg-emerald-600/90 backdrop-blur-md text-white text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shadow-md">
-                    <FileText className="w-3 h-3" />
-                    <span>{card2BuyersGuide.badge || 'Buyers Guide'}</span>
-                  </span>
-                </div>
-
-                <div className="absolute bottom-3 left-3 right-3 text-white">
-                  <span className="text-[10px] font-bold text-emerald-300 uppercase tracking-wider flex items-center space-x-1">
-                    <Compass className="w-3.5 h-3.5" />
-                    <span>Apartments, Plots & Resale</span>
-                  </span>
-                </div>
-              </div>
 
               {/* Card Body */}
-              <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-                <div className="space-y-2">
-                  <h4 className="text-base font-black text-[var(--text-primary)] group-hover:text-[#1E4FA8] transition-colors leading-snug line-clamp-2">
-                    {card2BuyersGuide.title}
+              <div className="p-2.5 sm:p-4 flex-1 flex flex-col justify-between space-y-2 sm:space-y-3">
+                <div className="space-y-0.5 sm:space-y-1">
+                  <h4 className="text-xs sm:text-sm font-black text-[var(--text-primary)] group-hover:text-[#1E4FA8] transition-colors leading-snug line-clamp-2">
+                    {blog.title}
                   </h4>
-                  <p className="text-xs text-[var(--text-secondary)] leading-relaxed line-clamp-3">
-                    {card2BuyersGuide.description}
+                  <p className="text-[9px] sm:text-xs text-[var(--text-secondary)] leading-relaxed line-clamp-2">
+                    {blog.excerpt}
                   </p>
                 </div>
 
@@ -288,68 +456,32 @@ export const KnowledgeHubSection: React.FC<KnowledgeHubSectionProps> = () => {
                 <div className="pt-2 border-t border-[var(--border)]">
                   <button
                     onClick={() => setActiveView('knowledge-hub')}
-                    className="w-full bg-[var(--surface-secondary)] hover:bg-[#1E4FA8] text-[var(--text-primary)] hover:text-white text-xs font-black py-2.5 px-4 rounded-xl border border-[var(--border)] hover:border-[#1E4FA8] transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
+                    className="w-full bg-[var(--surface-secondary)] hover:bg-[#1E4FA8] text-[var(--text-primary)] hover:text-white text-[11px] sm:text-xs font-black py-2 px-3 rounded-xl border border-[var(--border)] hover:border-[#1E4FA8] transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
                   >
-                    <span>{card2BuyersGuide.buttonText || 'Read More'}</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
+                    <span>Read Article</span>
+                    <ArrowRight className="w-3 h-3" />
                   </button>
                 </div>
               </div>
             </div>
+          ))}
 
-            {/* CARD 3: REAL ESTATE TRENDS & NEWS (PUBLIC) */}
-            <div className="bg-[var(--surface)] rounded-3xl border border-[var(--border)] overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
-              {/* Top Cover Image */}
-              <div className="relative h-44 overflow-hidden bg-slate-100">
-                <img
-                  src={card3TrendsNews.coverImage}
-                  alt={card3TrendsNews.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                
-                {/* Badge */}
-                <div className="absolute top-3 left-3">
-                  <span className="inline-flex items-center space-x-1 bg-[#1E4FA8]/90 backdrop-blur-md text-white text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shadow-md">
-                    <TrendingUp className="w-3 h-3" />
-                    <span>{card3TrendsNews.badge || 'Market Insights'}</span>
-                  </span>
-                </div>
+        </div>
 
-                <div className="absolute bottom-3 left-3 right-3 text-white">
-                  <span className="text-[10px] font-bold text-blue-200 uppercase tracking-wider flex items-center space-x-1">
-                    <TrendingUp className="w-3.5 h-3.5" />
-                    <span>Sambhajinagar & AURIC Growth</span>
-                  </span>
-                </div>
-              </div>
-
-              {/* Card Body */}
-              <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-                <div className="space-y-2">
-                  <h4 className="text-base font-black text-[var(--text-primary)] group-hover:text-[#1E4FA8] transition-colors leading-snug line-clamp-2">
-                    {card3TrendsNews.title}
-                  </h4>
-                  <p className="text-xs text-[var(--text-secondary)] leading-relaxed line-clamp-3">
-                    {card3TrendsNews.description}
-                  </p>
-                </div>
-
-                {/* Action */}
-                <div className="pt-2 border-t border-[var(--border)]">
-                  <button
-                    onClick={() => setActiveView('knowledge-hub')}
-                    className="w-full bg-[var(--surface-secondary)] hover:bg-[#1E4FA8] text-[var(--text-primary)] hover:text-white text-xs font-black py-2.5 px-4 rounded-xl border border-[var(--border)] hover:border-[#1E4FA8] transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
-                  >
-                    <span>{card3TrendsNews.buttonText || 'Read More'}</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </div>
-            </div>
-
+        {/* View All CTA Strip */}
+        <div className="flex flex-col sm:flex-row items-center justify-between pt-2 border-t border-[var(--border)]/60 text-xs text-[var(--text-secondary)] gap-3">
+          <div className="flex items-center gap-2 font-medium">
+            <BookOpen className="w-4 h-4 text-[var(--primary)]" />
+            <span>Curated research, MahaRERA advisories, and certified broker development modules</span>
           </div>
 
+          <button
+            onClick={() => setActiveView('knowledge-hub')}
+            className="inline-flex items-center space-x-1.5 text-xs font-bold text-[var(--primary)] hover:text-[var(--secondary)] transition-colors cursor-pointer group"
+          >
+            <span>View All Knowledge Hub Resources</span>
+            <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
+          </button>
         </div>
 
       </div>

@@ -64,42 +64,42 @@ export const TopLocalitiesRow: React.FC = () => {
   };
 
   return (
-    <section className="py-12 sm:py-16 bg-[#FAF7F2] border-b border-[#E5DEC9] transition-colors w-full overflow-hidden" id="explore-top-localities-section">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+    <section className="py-3.5 sm:py-8 bg-[#FAF7F2] border-b border-[#E5DEC9] transition-colors w-full overflow-hidden" id="explore-top-localities-section">
+      <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 space-y-3 sm:space-y-4">
         
         {/* Section Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-          <div className="space-y-1">
-            <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-amber-100 text-[#1E4FA8] text-xs font-black uppercase tracking-wider border border-amber-300/80">
-              <TrendingUp className="w-3.5 h-3.5 text-[#F2621E]" />
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 sm:gap-4">
+          <div className="space-y-0.5 sm:space-y-1">
+            <div className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full bg-amber-100 text-[#1E4FA8] text-[9px] sm:text-xs font-black uppercase tracking-wider border border-amber-300/80">
+              <TrendingUp className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[#F2621E]" />
               <span>{homeHeading}</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black text-[#1E4FA8] tracking-tight">
+            <h2 className="text-base sm:text-xl md:text-2xl font-black text-[#1E4FA8] tracking-tight">
               {homeHeading}
             </h2>
-            <p className="text-xs sm:text-sm text-slate-600 font-medium">
+            <p className="text-[10px] sm:text-xs text-slate-600 font-medium line-clamp-1 sm:line-clamp-none">
               {homeSubheading}
             </p>
           </div>
 
           <button
             onClick={() => setActiveView('properties')}
-            className="inline-flex items-center space-x-1.5 text-xs sm:text-sm font-black text-[#1E4FA8] hover:text-[#F2621E] transition-colors cursor-pointer group shrink-0"
+            className="inline-flex items-center space-x-1 text-[11px] sm:text-sm font-black text-[#1E4FA8] hover:text-[#F2621E] transition-colors cursor-pointer group shrink-0"
           >
             <span>View All Localities</span>
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
 
         {/* 5 Visible on Desktop, Horizontal Scroll on Mobile */}
-        <div className="flex sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 overflow-x-auto no-scrollbar pb-2 sm:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0">
+        <div className="flex sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-4 overflow-x-auto no-scrollbar pb-2 sm:pb-0 -mx-2.5 px-2.5 sm:mx-0 sm:px-0">
           {localities.map((loc, idx) => {
             const activeCount = allProperties.filter(p => p.approvalStatus !== 'pending' && (p.locality || '').toLowerCase().includes(loc.name.toLowerCase())).length;
             return (
             <div
               key={idx}
               onClick={() => handleSelectLocality(loc.name)}
-              className="min-w-[240px] sm:min-w-0 bg-white border border-[#E2DAC6] group overflow-hidden flex flex-col justify-between cursor-pointer hover:-translate-y-1 hover:border-[#1E4FA8]/50 hover:shadow-lg transition-all duration-300 rounded-2xl shadow-xs"
+              className="min-w-[145px] sm:min-w-0 bg-white border border-[#E2DAC6] group overflow-hidden flex flex-col justify-between cursor-pointer hover:-translate-y-1 hover:border-[#1E4FA8]/50 hover:shadow-lg transition-all duration-300 rounded-xl sm:rounded-2xl shadow-xs"
             >
               {/* Image with Thumbnail, Overlay & Count Badge */}
               <div className="relative aspect-16/10 overflow-hidden bg-slate-100">
@@ -112,33 +112,33 @@ export const TopLocalitiesRow: React.FC = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
                 
                 {/* Active Listings Badge */}
-                <div className="absolute bottom-2.5 left-2.5 text-white">
-                  <span className="bg-[#1E4FA8] text-white text-[10px] font-black px-2 py-0.5 rounded-md shadow-xs">
+                <div className="absolute bottom-1.5 left-1.5 sm:bottom-2.5 sm:left-2.5 text-white">
+                  <span className="bg-[#1E4FA8] text-white text-[8px] sm:text-[10px] font-black px-1.5 sm:px-2 py-0.2 sm:py-0.5 rounded-md shadow-xs">
                     {activeCount} active
                   </span>
                 </div>
 
                 {/* Growth Indicator */}
-                <div className="absolute top-2.5 right-2.5 bg-emerald-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded-md shadow-xs flex items-center space-x-1">
+                <div className="absolute top-1.5 right-1.5 sm:top-2.5 sm:right-2.5 bg-emerald-600 text-white text-[8px] sm:text-[9px] font-black px-1 sm:px-1.5 py-0.2 sm:py-0.5 rounded-md shadow-xs flex items-center space-x-0.5">
                   <span>{loc.growth}</span>
                 </div>
               </div>
 
               {/* Card Meta Content */}
-              <div className="p-3.5 space-y-2 flex-1 flex flex-col justify-between">
+              <div className="p-2 sm:p-3 space-y-1.5 flex-1 flex flex-col justify-between">
                 <div>
-                  <h3 className="font-black text-sm text-slate-900 group-hover:text-[#1E4FA8] transition-colors flex items-center space-x-1">
-                    <MapPin className="w-3.5 h-3.5 text-[#F2621E] shrink-0" />
+                  <h3 className="font-black text-xs sm:text-sm text-slate-900 group-hover:text-[#1E4FA8] transition-colors flex items-center space-x-1">
+                    <MapPin className="w-3 h-3 text-[#F2621E] shrink-0" />
                     <span className="truncate">{loc.name}</span>
                   </h3>
-                  <p className="text-[11px] text-slate-500 line-clamp-1 mt-0.5 font-medium">
+                  <p className="text-[9px] sm:text-[11px] text-slate-500 line-clamp-1 mt-0.5 font-medium">
                     {loc.tagline}
                   </p>
                 </div>
 
-                <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
-                  <span className="text-[11px] font-black text-[#1E4FA8]">{loc.avgPrice}</span>
-                  <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#F2621E] group-hover:translate-x-0.5 transition-all" />
+                <div className="pt-1.5 border-t border-slate-100 flex items-center justify-between text-[10px] sm:text-xs">
+                  <span className="text-[10px] sm:text-[11px] font-black text-[#1E4FA8] truncate">{loc.avgPrice}</span>
+                  <ArrowRight className="w-3 h-3 text-slate-400 group-hover:text-[#F2621E] group-hover:translate-x-0.5 transition-all shrink-0" />
                 </div>
               </div>
             </div>

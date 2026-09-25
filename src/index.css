@@ -34,6 +34,19 @@ html, body {
   width: 100%;
 }
 
+/* Mobile responsive root scaling for native, comfortable proportions */
+@media (max-width: 640px) {
+  html {
+    font-size: 13px;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 768px) {
+  html {
+    font-size: 14px;
+  }
+}
+
 * {
   box-sizing: border-box;
 }
@@ -383,25 +396,35 @@ button, input, select, textarea { max-width: 100%; }
   padding-bottom: 24px !important;
 }
 
-/* Mobile: preserve usability while keeping the same compact density */
+/* Mobile: preserve usability while keeping the same compact, native app-like density */
 @media (max-width: 767px) {
   [data-home-section] > section {
-    padding-top: 18px !important;
-    padding-bottom: 18px !important;
+    padding-top: 14px !important;
+    padding-bottom: 14px !important;
   }
   #hero-video-banner-section {
-    min-height: 440px !important;
+    min-height: 290px !important;
   }
   #hero-video-banner-section h1 {
-    font-size: 26px !important;
+    font-size: 19px !important;
+    line-height: 1.25 !important;
+  }
+  #hero-video-banner-section p {
+    font-size: 11px !important;
+    line-height: 1.35 !important;
   }
   #four-cta-cards-section [id^="cta-card-"] {
-    min-height: 158px;
+    min-height: auto !important;
+    padding: 9px !important;
   }
   #four-cta-cards-section .grid {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
   }
   #explore-top-localities-section .flex.sm\:grid > div {
-    min-width: 145px !important;
+    min-width: 140px !important;
+  }
+  .card-theme {
+    border-radius: 12px !important;
   }
 }

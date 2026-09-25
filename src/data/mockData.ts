@@ -468,6 +468,182 @@ export const INITIAL_PROPERTIES: Property[] = [
     createdAt: '2026-08-21T07:30:00Z',
     readyToMove: true,
     tags: ['Agricultural 7/12', 'Paithan Road', '0% Brokerage', 'Water Abundant']
+  },
+  {
+    id: 'prop-feat-01',
+    title: 'Ultra-Modern 3 BHK Corner Penthouse with Private Terrace',
+    description: 'Breathtaking 3 BHK penthouse in prime Samarth Nagar with exclusive 450 sq.ft private terrace garden, Italian marble flooring, and 2 covered car parks. Walking distance to elite schools and hospitals.',
+    price: 12500000,
+    priceDisplay: '₹ 1.25 Cr',
+    listingType: 'sale',
+    propertyType: 'penthouse',
+    bhk: 3,
+    bathrooms: 3,
+    locality: 'Samarth Nagar',
+    address: 'Near Kranti Chowk & Divisional Sports Complex, Samarth Nagar',
+    city: 'Chhatrapati Sambhajinagar',
+    carpetArea: 1720,
+    builtupArea: 2150,
+    reraApproved: true,
+    reraNumber: 'P51500049210',
+    verified: true,
+    zeroBrokerage: true,
+    featured: true,
+    featuredOrder: 1,
+    status: 'Active',
+    images: [
+      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80'
+    ],
+    amenities: [
+      'Private 450 Sq.Ft Terrace Garden',
+      'Italian Marble & Teak Wood Doors',
+      '2 Dedicated Stilt Car Parkings',
+      '24x7 Treated Borewell & Corporation Water',
+      '100% DG Power Backup for Home'
+    ],
+    ownerContact: {
+      name: 'Dr. Shekhar Deshmukh (Direct Owner)',
+      phone: '+91 98230 45678',
+      whatsapp: '+919823045678',
+      email: 'shekhar.deshmukh@gmail.com'
+    },
+    postedBy: 'Owner',
+    createdAt: '2026-09-20T10:00:00Z',
+    readyToMove: true,
+    tags: ['Corner Penthouse', 'Samarth Nagar', '0% Brokerage', 'Private Terrace', 'Verified Title']
+  },
+  {
+    id: 'prop-feat-02',
+    title: 'Fully Furnished 2 BHK Garden Facing Flat in CIDCO N-3',
+    description: 'Ready to occupy premium 2 BHK apartment in prime CIDCO N-3. Includes modular kitchen, Hafele fittings, 2 Daikin ACs, wooden wardrobes, and peaceful garden-facing balcony.',
+    price: 4200000,
+    priceDisplay: '₹ 42.0 Lakhs',
+    listingType: 'sale',
+    propertyType: 'apartment',
+    bhk: 2,
+    bathrooms: 2,
+    locality: 'CIDCO N-1 to N-4',
+    address: 'Near Prozone Mall & Shivaji Maharaj Chowk, CIDCO N-3',
+    city: 'Chhatrapati Sambhajinagar',
+    carpetArea: 890,
+    builtupArea: 1120,
+    reraApproved: true,
+    reraNumber: 'P51500038102',
+    verified: true,
+    zeroBrokerage: true,
+    featured: true,
+    featuredOrder: 2,
+    status: 'Active',
+    images: [
+      'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80'
+    ],
+    amenities: [
+      'Modular Kitchen with Chimney',
+      'Gated Society with CCTV Security',
+      'Covered Car & 2-Wheeler Parking',
+      'Solar Water Heater System',
+      '5-Minute Walk to Prozone Mall'
+    ],
+    ownerContact: {
+      name: 'Sunil Rao (Direct Owner)',
+      phone: '+91 94231 77654',
+      whatsapp: '+919423177654',
+      email: 'sunilrao.auric@gmail.com'
+    },
+    postedBy: 'Owner',
+    createdAt: '2026-09-22T08:15:00Z',
+    readyToMove: true,
+    tags: ['Ready to Move', 'CIDCO N-3', 'Garden Facing', 'Modular Kitchen', '0% Brokerage']
+  },
+  {
+    id: 'prop-feat-03',
+    title: 'Spacious 4 BHK Independent Luxury Row Villa',
+    description: 'Brand new luxury independent 4 BHK duplex row house in peaceful Garkheda Parisar. Features double-height living room, pooja room, internal elevator provision, and private front garden.',
+    price: 14500000,
+    priceDisplay: '₹ 1.45 Cr',
+    listingType: 'sale',
+    propertyType: 'Independent House / Villa',
+    bhk: 4,
+    bathrooms: 4,
+    locality: 'Garkheda Parisar',
+    address: 'Near Sutgirni Chowk & Dhoot Hospital, Garkheda Parisar',
+    city: 'Chhatrapati Sambhajinagar',
+    carpetArea: 2450,
+    builtupArea: 2900,
+    reraApproved: true,
+    reraNumber: 'P51500044199',
+    verified: true,
+    zeroBrokerage: true,
+    featured: true,
+    featuredOrder: 3,
+    status: 'Active',
+    images: [
+      'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1200&q=80'
+    ],
+    amenities: [
+      'Double Height Grand Living Hall',
+      'Provision for Hydraulic Internal Lift',
+      'Rainwater Harvesting & Solar Rooftop',
+      'Private 2-Car Parking Compound',
+      'Clear NA-47 Order & Individual 7/12'
+    ],
+    ownerContact: {
+      name: 'Advocate Anil Kulkarni',
+      phone: '+91 98902 33411',
+      whatsapp: '+919890233411',
+      email: 'anil.kulkarni.legal@gmail.com'
+    },
+    postedBy: 'Owner',
+    createdAt: '2026-09-23T11:45:00Z',
+    readyToMove: true,
+    tags: ['Luxury Villa', 'Garkheda', 'Independent 4 BHK', '0% Brokerage', 'Private Compound']
+  },
+  {
+    id: 'prop-feat-04',
+    title: 'Prime Commercial Ground Floor Showroom on Jalna Main Road',
+    description: 'High footfall prime ground floor commercial showroom touching Jalna Main Road. 38 feet all-glass frontage, 14 ft ceiling height, ample customer parking, 3-phase commercial power connection.',
+    price: 85000,
+    priceDisplay: '₹ 85,000 / mo',
+    listingType: 'rent',
+    propertyType: 'commercial',
+    bathrooms: 2,
+    locality: 'Jalna Road Commercial Strip',
+    address: 'Main Jalna Road, Near Akashwani & Seven Hills, Sambhajinagar',
+    city: 'Chhatrapati Sambhajinagar',
+    carpetArea: 1450,
+    builtupArea: 1650,
+    reraApproved: true,
+    reraNumber: 'P51500031120',
+    verified: true,
+    zeroBrokerage: true,
+    featured: true,
+    featuredOrder: 4,
+    status: 'Active',
+    images: [
+      'https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80'
+    ],
+    amenities: [
+      '38 Ft Toughened Glass Frontage',
+      '14 Ft Clear Ceiling Height',
+      'Front Customer Parking for 8 Cars',
+      'Commercial 3-Phase 30 KW Power',
+      'Ideal for Bank, Jewellery, or Brand Outlets'
+    ],
+    ownerContact: {
+      name: 'Rameshwar Chandak (Owner)',
+      phone: '+91 98220 89123',
+      whatsapp: '+919822089123',
+      email: 'chandak.enterprises@gmail.com'
+    },
+    postedBy: 'Owner',
+    createdAt: '2026-09-21T14:20:00Z',
+    readyToMove: true,
+    tags: ['Ground Floor Showroom', 'Jalna Road', 'Commercial Rent', 'Zero Brokerage']
   }
 ];
 
@@ -604,7 +780,7 @@ export const INITIAL_PROJECTS: Project[] = [
     description: 'Affordable yet modern smart homes tailored for engineers, corporate executives, and investors working in the burgeoning AURIC Industrial Smart City & Shendra MIDC zone.',
     totalUnits: 360,
     availableUnits: 142,
-    featured: false,
+    featured: true,
     exclusiveOffer: 'PMAY Subsidy benefit up to ₹2.67 Lakhs + ₹50,000 Booking Token',
     amenities: [
       'Solar Powered Common Area Lighting',
@@ -618,6 +794,186 @@ export const INITIAL_PROJECTS: Project[] = [
       phone: '+91 98811 44321',
       email: 'info@pridemarathwada.com',
       salesOffice: 'Pride City Phase 2 Sales Lounge, Shendra MIDC'
+    }
+  },
+  {
+    id: 'proj-07',
+    name: 'Venkatesh Sky Villas & High-Rise',
+    builderName: 'Venkatesh Landmarks Pvt Ltd',
+    developer: 'Venkatesh Landmarks Pvt Ltd',
+    locality: 'Jalna Road / Seven Hills',
+    address: 'Near Seven Hills Flyover, Main Jalna Road, Sambhajinagar',
+    location: 'Seven Hills, Jalna Road',
+    city: 'Chhatrapati Sambhajinagar',
+    priceRange: '₹ 95.0 L - ₹ 2.25 Cr',
+    minPrice: 9500000,
+    startingPrice: 9500000,
+    maxPrice: 22500000,
+    configurations: ['3 BHK Sky Suite', '4 BHK Grand Villa', '5 BHK Penthouse'],
+    reraId: 'P51500045889',
+    reraNumber: 'P51500045889',
+    completionDate: 'December 2027',
+    possessionDate: 'December 2027',
+    brochureUrl: '#',
+    bannerImage: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80',
+    image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80',
+    totalArea: '5.2 Acres',
+    images: [
+      'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80'
+    ],
+    description: 'Iconic 22-storey twin towers redefining luxury living on Jalna Road. Infinity rooftop pool, private elevator lobbies, and panoramic city views.',
+    totalUnits: 160,
+    availableUnits: 45,
+    featured: true,
+    exclusiveOffer: '0% Brokerage + 1 Year Complimentary Maintenance',
+    amenities: [
+      'Rooftop Infinity Edge Swimming Pool',
+      'Private Keycard Access Elevators',
+      'Triple-Height Grand Entrance Lobby',
+      'World-Class Health Club & Spa',
+      'Multi-Tier 24x7 Security Surveillance'
+    ],
+    status: 'Newly Launched',
+    developerContact: {
+      phone: '+91 94222 88776',
+      email: 'sales@venkateshskyvillas.com',
+      salesOffice: 'Venkatesh Experience Center, Seven Hills, Sambhajinagar'
+    }
+  },
+  {
+    id: 'proj-08',
+    name: 'Oasis Palm Springs Township',
+    builderName: 'Oasis Lifespaces Group',
+    developer: 'Oasis Lifespaces Group',
+    locality: 'Kanchanwadi / Paithan Road',
+    address: 'Near CSMSS College, Paithan Road, Kanchanwadi',
+    location: 'Kanchanwadi, Paithan Road',
+    city: 'Chhatrapati Sambhajinagar',
+    priceRange: '₹ 52.0 L - ₹ 98.0 L',
+    minPrice: 5200000,
+    startingPrice: 5200000,
+    maxPrice: 9800000,
+    configurations: ['2 BHK Palm Comfort', '3 BHK Palm Luxury'],
+    reraId: 'P51500039904',
+    reraNumber: 'P51500039904',
+    completionDate: 'June 2026',
+    possessionDate: 'June 2026',
+    brochureUrl: '#',
+    bannerImage: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80',
+    image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80',
+    totalArea: '8.5 Acres',
+    images: [
+      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80'
+    ],
+    description: 'Resort-style integrated residential township on scenic Paithan Road. 70% open landscaped spaces, organic orchards, jogging trails, and sports arena.',
+    totalUnits: 240,
+    availableUnits: 58,
+    featured: true,
+    exclusiveOffer: 'Special festive discount of ₹1.5 Lakhs on spot booking',
+    amenities: [
+      'Palm Boulevard & Central Park',
+      'Heated Kids & Adult Swimming Pools',
+      'Tennis & Pickleball Courts',
+      'On-site Pharmacy & Daily Convenience Store',
+      'Rainwater Harvesting & Solar Street Lighting'
+    ],
+    status: 'Under Construction',
+    developerContact: {
+      phone: '+91 98225 11223',
+      email: 'sales@oasispalmsprings.in',
+      salesOffice: 'Oasis Palm Springs Site Office, Kanchanwadi'
+    }
+  },
+  {
+    id: 'proj-09',
+    name: 'Kohinoor Grand IT & Commercial Landmark',
+    builderName: 'Kohinoor Infrastructure Ltd',
+    developer: 'Kohinoor Infrastructure Ltd',
+    locality: 'Chikalthana MIDC / Airport Road',
+    address: 'Opposite Cambridge School, Airport Road, Chikalthana',
+    location: 'Chikalthana MIDC, Airport Road',
+    city: 'Chhatrapati Sambhajinagar',
+    priceRange: '₹ 45.0 L - ₹ 1.80 Cr',
+    minPrice: 4500000,
+    startingPrice: 4500000,
+    maxPrice: 18000000,
+    configurations: ['Grade-A IT Office Suites', 'Ground Floor Retail Outlets', 'Showroom Spaces'],
+    reraId: 'P51500042718',
+    reraNumber: 'P51500042718',
+    completionDate: 'Ready to Move',
+    possessionDate: 'Ready to Move',
+    brochureUrl: '#',
+    bannerImage: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80',
+    image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80',
+    totalArea: '3.5 Acres',
+    images: [
+      'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1200&q=80'
+    ],
+    description: 'Chhatrapati Sambhajinagar’s foremost Grade-A commercial hub designed for IT companies, MNC regional headquarters, and flagship retail showrooms.',
+    totalUnits: 120,
+    availableUnits: 32,
+    featured: true,
+    exclusiveOffer: 'Guaranteed 8.5% Rental Yield Lease-Assistance for Investors',
+    amenities: [
+      'Centrally Air-Conditioned Grand Atrium',
+      'High-Speed OTIS Elevators with Destination Dispatch',
+      'Bespoke Food Court & Rooftop Executive Lounge',
+      'Multi-Level Basement Parking with 300+ Bays',
+      'Full DG Power Backup & 24/7 Security'
+    ],
+    status: 'Ready to Move',
+    developerContact: {
+      phone: '+91 94237 99001',
+      email: 'commercial@kohinoorgrand.in',
+      salesOffice: 'Kohinoor Grand Marketing Office, Chikalthana MIDC'
+    }
+  },
+  {
+    id: 'proj-10',
+    name: 'Aura Celestial Towers',
+    builderName: 'Celestial Promoters & Realty',
+    developer: 'Celestial Promoters & Realty',
+    locality: 'Beed Bypass Road',
+    address: 'Near Deogiri College Extension & Sutgirni, Beed Bypass',
+    location: 'Beed Bypass Road',
+    city: 'Chhatrapati Sambhajinagar',
+    priceRange: '₹ 68.0 L - ₹ 1.55 Cr',
+    minPrice: 6800000,
+    startingPrice: 6800000,
+    maxPrice: 15500000,
+    configurations: ['2 BHK Celestial', '3 BHK Divine', '4 BHK Imperial'],
+    reraId: 'P51500048821',
+    reraNumber: 'P51500048821',
+    completionDate: 'April 2027',
+    possessionDate: 'April 2027',
+    brochureUrl: '#',
+    bannerImage: 'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1200&q=80',
+    image: 'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1200&q=80',
+    totalArea: '4.8 Acres',
+    images: [
+      'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80'
+    ],
+    description: 'High-rise architectural marvel situated strategically on Beed Bypass with hill views, private sundecks, and European styled interiors.',
+    totalUnits: 210,
+    availableUnits: 62,
+    featured: true,
+    exclusiveOffer: 'Special Easy Payment Plan: 10:80:10 with Zero Pre-EMI',
+    amenities: [
+      'Aura Lifestyle Sky Deck on 18th Floor',
+      'Air-Conditioned Banquet & Party Lawn',
+      'State-of-the-Art Crossfit Gymnasium',
+      'Children’s Interactive Splash Park',
+      'EV Car Fast Charging Bays'
+    ],
+    status: 'Under Construction',
+    developerContact: {
+      phone: '+91 99234 55667',
+      email: 'connect@auracelestial.com',
+      salesOffice: 'Aura Celestial Sales Gallery, Beed Bypass'
     }
   }
 ];

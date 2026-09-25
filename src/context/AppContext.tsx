@@ -276,7 +276,8 @@ export interface HomePageConfig {
 const DEFAULT_HOME_SECTION_DEFINITIONS: Array<[string, string]> = [
   ['hero','Hero & Search'], ['localities','Top Localities'], ['cta','Quick Action Cards'],
   ['services','Services'], ['bannerAds','Banner Ads'], ['featuredProjects','Featured Projects'],
-  ['projects','Projects'], ['loanBanner','Loan Banner'], ['saleProperties','Properties on Sale'],
+  ['projects','Projects'], ['loanBanner','Loan Banner'], ['featuredProperties','Featured Properties'],
+  ['saleProperties','Properties on Sale'],
   ['realtors','Verified Realtors'], ['clubs','Realtor & Affiliate Clubs'], ['rentProperties','Properties on Rent'],
   ['testimonials','Home Buyers'], ['knowledgeHub','Knowledge Hub'],
   ['whyChoose','Why Choose Auricity']
@@ -285,9 +286,9 @@ const DEFAULT_HOME_SECTION_DEFINITIONS: Array<[string, string]> = [
 export const DEFAULT_HOME_PAGE_CONFIG: HomePageConfig = {
   sections: DEFAULT_HOME_SECTION_DEFINITIONS.map(([id,label]) => ({
     id, label, visible: !['whyChoose'].includes(id),
-    layout: id === 'projects' ? 'split' : (['services','localities','featuredProjects','realtors','testimonials','knowledgeHub'].includes(id) ? 'carousel' : 'auto'),
+    layout: id === 'projects' ? 'split' : (['services','localities','featuredProjects','featuredProperties','realtors','testimonials','knowledgeHub'].includes(id) ? 'carousel' : 'auto'),
     background: 'default', spacing: 'normal',
-    autoScroll: ['services','featuredProjects','realtors','testimonials','localities','knowledgeHub'].includes(id),
+    autoScroll: ['services','featuredProjects','featuredProperties','realtors','testimonials','localities','knowledgeHub'].includes(id),
     autoScrollSpeed: 1,
   })),
   autoScrollOffset: 80, smoothScroll: true, scrollDuration: 450, showEditorHints: true,
@@ -395,16 +396,42 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const saved = localStorage.getItem('auricity_properties');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) return dedupe(parsed.map(p => normalizeProperty(p)));
+        if (Array.isArray(parsed)) {
+          // Merge seed with parsed so newly added properties are immediately visible
+          const parsedMap = new Map(parsed.map((p: any) => [p.id, normalizeProperty(p)]));
+          // Keep user modifications if id matches, but include newly added seed items
+          const combined = seed.map(s => parsedMap.get(s.id) || s);
+          // Add any custom properties created by user that are not in seed
+          parsed.forEach((p: any) => {
+            if (!seed.some(s => s.id === p.id)) {
+              combined.push(normalizeProperty(p));
+            }
+          });
+          return dedupe(combined);
+        }
       }
     } catch {}
     return dedupe(seed);
   });
 
   const [projects, setProjects] = useState<Project[]>(() => {
+    const dedupe = (items: Project[]) => Array.from(new Map(items.map(p => [p.id, p])).values());
     try {
       const saved = localStorage.getItem('auricity_projects');
-      return saved ? JSON.parse(saved) : INITIAL_PROJECTS;
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          const parsedMap = new Map(parsed.map((p: any) => [p.id, p]));
+          const combined = INITIAL_PROJECTS.map(s => parsedMap.get(s.id) || s);
+          parsed.forEach((p: any) => {
+            if (!INITIAL_PROJECTS.some(s => s.id === p.id)) {
+              combined.push(p);
+            }
+          });
+          return dedupe(combined);
+        }
+      }
+      return INITIAL_PROJECTS;
     } catch {
       return INITIAL_PROJECTS;
     }

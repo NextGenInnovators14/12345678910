@@ -47,37 +47,37 @@ export const PropertiesRentSection: React.FC = () => {
     : rentProperties).slice(0, 2);
 
   return (
-    <section className="py-12 sm:py-16 bg-[var(--surface)] border-b border-[var(--border)] transition-colors w-full overflow-hidden" id="properties-on-rent-section">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+    <section className="py-3.5 sm:py-8 bg-[var(--surface)] border-b border-[var(--border)] transition-colors w-full overflow-hidden" id="properties-on-rent-section">
+      <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 space-y-3 sm:space-y-4">
         
         {/* Section Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-          <div className="space-y-1">
-            <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-[var(--primary-light)] text-[var(--primary)] text-xs font-black uppercase tracking-wider border border-[var(--primary)]/20">
-              <KeyRound className="w-3.5 h-3.5 text-[var(--secondary)]" />
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 sm:gap-4">
+          <div className="space-y-0.5 sm:space-y-1">
+            <div className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full bg-[var(--primary-light)] text-[var(--primary)] text-[9px] sm:text-xs font-black uppercase tracking-wider border border-[var(--primary)]/20">
+              <KeyRound className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[var(--secondary)]" />
               <span>Zero Brokerage Direct Rentals</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black text-[var(--text-primary)] tracking-tight whitespace-nowrap">
+            <h2 className="text-base sm:text-xl md:text-2xl font-black text-[var(--text-primary)] tracking-tight">
               {homeHeading}
             </h2>
-            <p className="text-xs sm:text-sm text-[var(--text-secondary)] font-medium">
+            <p className="text-[10px] sm:text-xs text-[var(--text-secondary)] font-medium line-clamp-1 sm:line-clamp-none">
               {homeSubheading}
             </p>
           </div>
 
           {/* Controls: Tab Toggle & View All */}
-          <div className="flex items-center space-x-3 self-start sm:self-auto overflow-x-auto no-scrollbar w-full sm:w-auto">
-            <div className="flex items-center space-x-1 bg-[var(--surface-secondary)] p-1 rounded-xl border border-[var(--border)] shadow-2xs shrink-0">
+          <div className="flex items-center space-x-1.5 sm:space-x-3 self-start sm:self-auto overflow-x-auto no-scrollbar w-full sm:w-auto">
+            <div className="flex items-center space-x-0.5 bg-[var(--surface-secondary)] p-0.5 rounded-lg border border-[var(--border)] shadow-2xs shrink-0">
               {[
-                { id: 'all', label: 'All Rentals' },
-                { id: 'residential', label: 'Flats & Houses' },
-                { id: 'commercial', label: 'Offices / Shops' },
-                { id: 'pg', label: 'PG & Hostels' }
+                { id: 'all', label: 'All' },
+                { id: 'residential', label: 'Flats & Villas' },
+                { id: 'commercial', label: 'Commercial' },
+                { id: 'pg', label: 'PG' }
               ].map(tab => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                  className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-md sm:rounded-lg text-[10px] sm:text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
                     activeTab === tab.id
                       ? 'bg-[var(--primary)] text-white shadow-xs'
                       : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
@@ -90,26 +90,27 @@ export const PropertiesRentSection: React.FC = () => {
 
             <button
               onClick={() => setActiveView('rentals')}
-              className="hidden lg:inline-flex items-center space-x-1.5 text-xs font-black text-[var(--primary)] hover:text-[var(--secondary)] transition-colors cursor-pointer group shrink-0"
+              className="inline-flex items-center space-x-1 text-[11px] sm:text-xs font-black text-[var(--primary)] hover:text-[var(--secondary)] transition-colors cursor-pointer group shrink-0"
             >
               <span>View All Rentals</span>
-              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
         </div>
 
         {/* Combined Layout: Main Grid (left 8 cols) + Featured Sidebar (right 4 cols on desktop, below on mobile) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-start">
           
           {/* Main Grid (8 cols desktop, 2-col on mobile/tablet) */}
-          <div className="lg:col-span-8 space-y-4">
-            <div className="flex gap-4 overflow-x-auto scrollbar-thin scrollbar-thumb-[var(--primary)]/40 scrollbar-track-[var(--surface-secondary)] snap-x snap-mandatory pb-2">
+          <div className="lg:col-span-8 space-y-3 sm:space-y-4">
+            <div className="flex gap-2.5 sm:gap-4 overflow-x-auto scrollbar-thin scrollbar-thumb-[var(--primary)]/40 scrollbar-track-[var(--surface-secondary)] snap-x snap-mandatory pb-2">
               {mainRentList.map((property) => (
-                <PropertyCard
-                  key={property.id}
-                  property={property}
-                  onSelect={(p) => navigateToPropertyDetail(p.id)}
-                />
+                <div key={property.id} className="w-[190px] sm:w-[245px] md:w-[280px] shrink-0 snap-start flex flex-col">
+                  <PropertyCard
+                    property={property}
+                    onSelect={(p) => navigateToPropertyDetail(p.id)}
+                  />
+                </div>
               ))}
             </div>
 

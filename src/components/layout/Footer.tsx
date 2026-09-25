@@ -64,7 +64,7 @@ export const Footer: React.FC<FooterProps> = () => {
   ] as const;
 
   return (
-    <footer className="bg-[#0F172A] text-slate-300 border-t border-slate-800">
+    <footer className="bg-[#0F172A] text-slate-300 border-t border-slate-800 pb-20 sm:pb-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-6">
         {/* Compact primary footer */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.35fr_1fr_1fr] gap-4 lg:gap-7">

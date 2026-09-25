@@ -148,42 +148,43 @@ export const Navbar: React.FC<NavbarProps> = ({
       <header className="sticky top-0 z-40 bg-white/98 backdrop-blur-md border-b border-[#E5DEC9] transition-colors w-full shadow-xs">
         
         {/* 1. TOP ANNOUNCEMENT BAR (sticky, above header) */}
-        <div className="bg-[#1E4FA8] text-white py-1.5 px-3 sm:px-4 text-xs font-semibold border-b border-black/10 w-full transition-colors">
-          <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
+        <div className="bg-[#1E4FA8] text-white py-1 sm:py-1.5 px-3 sm:px-4 text-[10px] sm:text-xs font-semibold border-b border-black/10 w-full transition-colors">
+          <div className="max-w-7xl mx-auto flex items-center justify-between gap-x-2">
             
             {/* Left: "Are You A Property Owner? List Your Property" + orange "FREE" pill button */}
-            <div className="flex items-center space-x-2 min-w-0">
-              <span className="text-[11px] sm:text-xs text-white/95 font-medium truncate">
-                {topText}
+            <div className="flex items-center space-x-1.5 sm:space-x-2 min-w-0">
+              <span className="text-[10px] sm:text-xs text-white/95 font-medium truncate">
+                <span className="hidden sm:inline">{topText}</span>
+                <span className="sm:hidden font-bold">List Property</span>
               </span>
               <button
                 id="top-announcement-post-free-btn"
                 onClick={() => setActiveView('post-property')}
-                className="bg-[#F2621E] hover:bg-[#d95214] text-white text-[10px] sm:text-[11px] font-black px-2.5 py-0.5 rounded-full shadow-xs transition-transform active:scale-95 cursor-pointer uppercase tracking-wider shrink-0"
+                className="bg-[#F2621E] hover:bg-[#d95214] text-white text-[9px] sm:text-[11px] font-black px-2 py-0.2 sm:py-0.5 rounded-full shadow-xs transition-transform active:scale-95 cursor-pointer uppercase tracking-wider shrink-0"
               >
                 {topPillText}
               </button>
             </div>
 
-            {/* Right: WhatsApp icon + "Join Auricity" link, Facebook/Instagram/YouTube icons, "Register" and "Sign In" links */}
-            <div className="flex items-center space-x-3 sm:space-x-4 text-[11px] sm:text-xs shrink-0">
+            {/* Right: Partner Desks, Sign In */}
+            <div className="flex items-center space-x-2 sm:space-x-3 text-[10px] sm:text-xs shrink-0 font-bold">
               
-              {/* WhatsApp + Join Auricity */}
+              {/* WhatsApp + Join Auricity (Desktop only) */}
               <a
                 href={joinLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center space-x-1 text-emerald-300 hover:text-emerald-200 font-bold transition-colors"
+                className="hidden md:flex items-center space-x-1 text-emerald-300 hover:text-emerald-200 font-bold transition-colors"
                 title="Join Auricity WhatsApp Community"
               >
-                <MessageSquare className="w-3.5 h-3.5 fill-emerald-400/20 text-emerald-300" />
+                <MessageSquare className="w-3 h-3 fill-emerald-400/20 text-emerald-300" />
                 <span>{joinText}</span>
               </a>
 
-              <span className="text-white/30 hidden sm:inline">|</span>
+              <span className="text-white/30 hidden md:inline">|</span>
 
-              {/* Social Icons */}
-              <div className="hidden sm:flex items-center space-x-2 text-white/80">
+              {/* Social Icons (Desktop only) */}
+              <div className="hidden lg:flex items-center space-x-2 text-white/80">
                 <a 
                   href={navigationConfig?.socialLinks?.facebook || 'https://facebook.com/auricity'} 
                   target="_blank" 
@@ -191,7 +192,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   className="hover:text-white transition-colors"
                   aria-label="Facebook"
                 >
-                  <Facebook className="w-3.5 h-3.5" />
+                  <Facebook className="w-3 h-3" />
                 </a>
                 <a 
                   href={navigationConfig?.socialLinks?.instagram || 'https://instagram.com/auricity.official'} 
@@ -200,7 +201,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   className="hover:text-white transition-colors"
                   aria-label="Instagram"
                 >
-                  <Instagram className="w-3.5 h-3.5" />
+                  <Instagram className="w-3 h-3" />
                 </a>
                 <a 
                   href={navigationConfig?.socialLinks?.youtube || 'https://youtube.com/@auricity'} 
@@ -209,14 +210,14 @@ export const Navbar: React.FC<NavbarProps> = ({
                   className="hover:text-white transition-colors"
                   aria-label="YouTube"
                 >
-                  <Youtube className="w-3.5 h-3.5" />
+                  <Youtube className="w-3 h-3" />
                 </a>
               </div>
 
-              <span className="text-white/30">|</span>
+              <span className="text-white/30 hidden lg:inline">|</span>
 
               {/* Partner Desks */}
-              <div className="flex items-center space-x-2 text-[11px] font-bold">
+              <div className="flex items-center space-x-1.5 sm:space-x-2 text-[10px] sm:text-[11px] font-bold">
                 <button
                   onClick={() => setActiveView('broker-login')}
                   className="text-blue-200 hover:text-white transition-colors cursor-pointer flex items-center space-x-1"
@@ -225,10 +226,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <span className="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
                   <span>Broker Desk</span>
                 </button>
-                <span className="text-white/30">•</span>
+                <span className="text-white/30 hidden sm:inline">•</span>
                 <button
                   onClick={() => setActiveView('affiliate-login')}
-                  className="text-amber-200 hover:text-amber-100 transition-colors cursor-pointer flex items-center space-x-1"
+                  className="hidden sm:flex text-amber-200 hover:text-amber-100 transition-colors cursor-pointer items-center space-x-1"
                   title="Affiliate Partner Sign In"
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
@@ -239,14 +240,14 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span className="text-white/30">|</span>
 
               {/* Register & Sign In Links */}
-              <div className="flex items-center space-x-2 font-bold">
+              <div className="flex items-center space-x-1.5 sm:space-x-2 font-bold text-[10px] sm:text-xs">
                 <button
                   onClick={() => setActiveView('register')}
-                  className="hover:text-amber-300 transition-colors cursor-pointer"
+                  className="hidden sm:inline hover:text-amber-300 transition-colors cursor-pointer"
                 >
                   Register
                 </button>
-                <span className="text-white/30">/</span>
+                <span className="text-white/30 hidden sm:inline">/</span>
                 <button
                   onClick={() => setActiveView('signin')}
                   className="hover:text-amber-300 transition-colors cursor-pointer text-amber-200"
@@ -262,18 +263,18 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* 2. MAIN HEADER & DESKTOP NAV */}
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 w-full" ref={dropdownRef}>
-          <div className="flex items-center justify-between h-14 sm:h-16 gap-2 sm:gap-4">
+          <div className="flex items-center justify-between h-12 sm:h-16 gap-2 sm:gap-4">
             
             {/* Logo on Left */}
             <div className="flex items-center shrink-0">
               {(homePageConfig?.brandLogoUrl || settings?.brandLogoUrl) ? (
                 <button onClick={() => setActiveView('home')} className="cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98]">
-                  <img src={homePageConfig?.brandLogoUrl || settings.brandLogoUrl} alt="Auricity" className="h-11 sm:h-12 w-auto max-w-[190px] object-contain" referrerPolicy="no-referrer" />
+                  <img src={homePageConfig?.brandLogoUrl || settings.brandLogoUrl} alt="Auricity" className="h-8 sm:h-11 w-auto max-w-[140px] sm:max-w-[190px] object-contain" referrerPolicy="no-referrer" />
                 </button>
               ) : (
                 <AuricityLogo 
                   variant="compact" 
-                  size="md" 
+                  size="sm" 
                   onClick={() => setActiveView('home')} 
                   className="cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98]"
                 />

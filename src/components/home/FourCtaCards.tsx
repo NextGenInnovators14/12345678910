@@ -83,21 +83,21 @@ export const FourCtaCards: React.FC<FourCtaCardsProps> = ({
   ];
 
   return (
-    <section className="py-6 sm:py-8 bg-[#F5F1E8] border-b border-[#E5DEC9] transition-colors w-full" id="four-cta-cards-section">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
+    <section className="py-3.5 sm:py-8 bg-[#F5F1E8] border-b border-[#E5DEC9] transition-colors w-full" id="four-cta-cards-section">
+      <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 space-y-3 sm:space-y-4">
         
         {/* Section Heading */}
-        <div className="text-center space-y-1 max-w-2xl mx-auto">
-          <span className="text-[11px] font-black text-[#F2621E] uppercase tracking-wider">
+        <div className="text-center space-y-0.5 sm:space-y-1 max-w-2xl mx-auto">
+          <span className="text-[9px] sm:text-[11px] font-black text-[#F2621E] uppercase tracking-wider">
             Ecosystem Portals & Opportunities
           </span>
-          <h2 className="text-base sm:text-xl font-black text-[#1E4FA8] tracking-tight">
+          <h2 className="text-sm sm:text-xl font-black text-[#1E4FA8] tracking-tight">
             {homeHeading}
           </h2>
         </div>
 
         {/* Two primary actions: clean two-column desktop layout and swipeable mobile row. */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 overflow-x-auto no-scrollbar pb-2 snap-x snap-mandatory lg:grid lg:overflow-visible lg:pb-0">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 overflow-x-auto no-scrollbar pb-1 snap-x snap-mandatory lg:grid lg:overflow-visible lg:pb-0">
           {cards.map((card) => {
             const Icon = card.icon;
 
@@ -105,40 +105,40 @@ export const FourCtaCards: React.FC<FourCtaCardsProps> = ({
               <div
                 key={card.id}
                 onClick={card.action}
-                className="min-w-0 snap-start bg-white border border-[#E2DAC6] group p-3 sm:p-4 rounded-xl flex flex-col justify-between space-y-4 hover:-translate-y-1 hover:border-[#1E4FA8]/50 hover:shadow-lg transition-all duration-300 cursor-pointer shadow-xs"
+                className="min-w-0 snap-start bg-white border border-[#E2DAC6] group p-2.5 sm:p-4 rounded-xl flex flex-col justify-between space-y-2 sm:space-y-4 hover:-translate-y-1 hover:border-[#1E4FA8]/50 hover:shadow-lg transition-all duration-300 cursor-pointer shadow-xs"
                 id={`cta-card-${card.id}`}
               >
                 {/* Card Top: Icon & Badge */}
                 <div className="flex items-start justify-between">
-                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center border shadow-2xs ${card.iconBg}`}>
-                    <Icon className="w-4 h-4" />
+                  <div className={`w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl flex items-center justify-center border shadow-2xs ${card.iconBg}`}>
+                    <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   </div>
-                  <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-2xs ${card.badgeColor}`}>
+                  <span className={`text-[8px] sm:text-[10px] font-black px-1.5 sm:px-2.5 py-0.2 sm:py-0.5 rounded-full uppercase tracking-wider shadow-2xs ${card.badgeColor}`}>
                     {card.badge}
                   </span>
                 </div>
 
                 {/* Card Content */}
-                <div className="space-y-1.5 flex-1">
-                  <div className="text-[11px] font-bold text-[#F2621E]">
+                <div className="space-y-0.5 sm:space-y-1.5 flex-1">
+                  <div className="text-[9px] sm:text-[11px] font-bold text-[#F2621E]">
                     {card.subtitle}
                   </div>
-                  <h3 className="font-black text-sm text-slate-900 group-hover:text-[#1E4FA8] transition-colors leading-snug">
+                  <h3 className="font-black text-xs sm:text-sm text-slate-900 group-hover:text-[#1E4FA8] transition-colors leading-snug line-clamp-1">
                     {card.title}
                   </h3>
-                  <p className="text-xs text-slate-600 leading-relaxed font-medium line-clamp-3">
+                  <p className="text-[9px] sm:text-xs text-slate-600 leading-relaxed font-medium line-clamp-2 sm:line-clamp-3">
                     {card.desc}
                   </p>
                 </div>
 
                 {/* Card Bottom CTA Button */}
-                <div className="pt-3 border-t border-slate-100">
+                <div className="pt-1.5 sm:pt-3 border-t border-slate-100">
                   <button
                     type="button"
-                    className={`w-full py-2 px-2.5 rounded-xl text-xs font-black flex items-center justify-center space-x-1.5 transition-all shadow-xs cursor-pointer ${card.ctaStyle}`}
+                    className={`w-full py-1.5 sm:py-2 px-2 sm:px-2.5 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-black flex items-center justify-center space-x-1 sm:space-x-1.5 transition-all shadow-xs cursor-pointer ${card.ctaStyle}`}
                   >
                     <span>{card.ctaText}</span>
-                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 group-hover:translate-x-1 transition-transform" />
                   </button>
                 </div>
               </div>

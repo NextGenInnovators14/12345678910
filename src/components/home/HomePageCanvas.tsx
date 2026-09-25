@@ -6,6 +6,7 @@ import { FourCtaCards } from './FourCtaCards';
 import { ServicesRow } from './ServicesRow';
 import { BannerAdsCarousel } from './BannerAdsCarousel';
 import { FeaturedProjectsRow } from './FeaturedProjectsRow';
+import { FeaturedSection } from './FeaturedSection';
 import { ProjectsSection } from './ProjectsSection';
 import { LoanBannerSection } from './LoanBannerSection';
 import { PropertiesSaleSection } from './PropertiesSaleSection';
@@ -21,9 +22,9 @@ interface Props { editMode?: boolean; selectedId?: string; onSelect?: (id: strin
 const COMPONENTS: Record<string, React.FC<any>> = {
   hero: HeroVideoSection, localities: TopLocalitiesRow, cta: FourCtaCards, services: ServicesRow,
   bannerAds: BannerAdsCarousel, featuredProjects: FeaturedProjectsRow, projects: ProjectsSection,
-  loanBanner: LoanBannerSection, saleProperties: PropertiesSaleSection, realtors: VerifiedRealtorsRow,
-  clubs: TwoClubCards, rentProperties: PropertiesRentSection, testimonials: BuyerTestimonialsSection,
-  knowledgeHub: KnowledgeHubSection, whyChoose: WhyChooseAuricity,
+  loanBanner: LoanBannerSection, featuredProperties: FeaturedSection, saleProperties: PropertiesSaleSection,
+  realtors: VerifiedRealtorsRow, clubs: TwoClubCards, rentProperties: PropertiesRentSection,
+  testimonials: BuyerTestimonialsSection, knowledgeHub: KnowledgeHubSection, whyChoose: WhyChooseAuricity,
 };
 
 const spacing: Record<string,string> = { tight: 'py-1', normal: 'py-0', airy: 'py-5 sm:py-8' };
